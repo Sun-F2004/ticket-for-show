@@ -1,0 +1,175 @@
+@import './variables.scss';
+
+// 全局样式重置
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: $text-primary;
+  background-color: $background-color-base;
+}
+
+// 通用样式类
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-base;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.p-10 {
+  padding: 10px;
+}
+
+.p-20 {
+  padding: 20px;
+}
+
+// 按钮样式覆盖
+.el-button--primary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  
+  &:hover, &:focus {
+    background-color: darken($primary-color, 10%);
+    border-color: darken($primary-color, 10%);
+  }
+}
+
+// 卡片样式
+.show-card {
+  background: #fff;
+  border-radius: $border-radius-large;
+  box-shadow: $box-shadow-light;
+  overflow: hidden;
+  transition: $transition-base;
+  
+  &:hover {
+    box-shadow: $box-shadow-dark;
+    transform: translateY(-2px);
+  }
+}
+
+// 价格样式
+.price {
+  color: $primary-color;
+  font-weight: bold;
+  font-size: $font-size-large;
+}
+
+.price-small {
+  color: $primary-color;
+  font-weight: bold;
+  font-size: $font-size-base;
+}
+
+// 标签样式
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: $border-radius-small;
+  font-size: $font-size-extra-small;
+  color: #fff;
+  
+  &.tag-hot {
+    background-color: $danger-color;
+  }
+  
+  &.tag-new {
+    background-color: $success-color;
+  }
+  
+  &.tag-sale {
+    background-color: $warning-color;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .container {
+    padding: 0 $spacing-small;
+  }
+  
+  .show-card {
+    margin-bottom: $spacing-base;
+  }
+}
+
+// 加载状态
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+// 空状态
+.empty-container {
+  text-align: center;
+  padding: $spacing-extra-large;
+  color: $text-secondary;
+  
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: $spacing-base;
+  }
+  
+  .empty-text {
+    font-size: $font-size-medium;
+  }
+} 
