@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <Header />
-    
+    <Header/>
+
     <!-- 轮播图 -->
     <div class="banner-section">
       <el-carousel height="400px" indicator-position="outside">
@@ -18,16 +18,16 @@
         </el-carousel-item>
       </el-carousel>
     </div>
-    
+
     <!-- 分类导航 -->
     <div class="category-section">
       <div class="container">
         <div class="category-grid">
-          <div 
-            v-for="category in categories" 
-            :key="category.id"
-            class="category-item"
-            @click="goToCategory(category.path)"
+          <div
+              v-for="category in categories"
+              :key="category.id"
+              class="category-item"
+              @click="goToCategory(category.path)"
           >
             <i :class="category.icon"></i>
             <span>{{ category.name }}</span>
@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 热门演出 -->
     <div class="section">
       <div class="container">
@@ -43,16 +43,16 @@
           <h2>热门演出</h2>
           <router-link to="/category/hot" class="more-link">查看更多 <i class="el-icon-arrow-right"></i></router-link>
         </div>
-        
+
         <div v-loading="loading" class="show-grid">
-          <div 
-            v-for="show in hotShows" 
-            :key="show.id"
-            class="show-card"
-            @click="goToShow(show.id)"
+          <div
+              v-for="show in hotShows"
+              :key="show.id"
+              class="show-card"
+              @click="goToShow(show.id)"
           >
             <div class="show-image">
-              <img :src="show.image" :alt="show.title" />
+              <img :src="show.image" :alt="show.title"/>
               <div class="show-tags">
                 <span v-if="show.isHot" class="tag tag-hot">热门</span>
                 <span v-if="show.isNew" class="tag tag-new">新品</span>
@@ -71,24 +71,25 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 推荐演出 -->
     <div class="section">
       <div class="container">
         <div class="section-header">
           <h2>为您推荐</h2>
-          <router-link to="/category/recommended" class="more-link">查看更多 <i class="el-icon-arrow-right"></i></router-link>
+          <router-link to="/category/recommended" class="more-link">查看更多 <i class="el-icon-arrow-right"></i>
+          </router-link>
         </div>
-        
+
         <div v-loading="loading" class="show-grid">
-          <div 
-            v-for="show in recommendedShows" 
-            :key="show.id"
-            class="show-card"
-            @click="goToShow(show.id)"
+          <div
+              v-for="show in recommendedShows"
+              :key="show.id"
+              class="show-card"
+              @click="goToShow(show.id)"
           >
             <div class="show-image">
-              <img :src="show.image" :alt="show.title" />
+              <img :src="show.image" :alt="show.title"/>
               <div class="show-tags">
                 <span v-if="show.isHot" class="tag tag-hot">热门</span>
                 <span v-if="show.isNew" class="tag tag-new">新品</span>
@@ -107,24 +108,25 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 最新演出 -->
     <div class="section">
       <div class="container">
         <div class="section-header">
           <h2>最新演出</h2>
-          <router-link to="/category/latest" class="more-link">查看更多 <i class="el-icon-arrow-right"></i></router-link>
+          <router-link to="/category/latest" class="more-link">查看更多 <i class="el-icon-arrow-right"></i>
+          </router-link>
         </div>
-        
+
         <div v-loading="loading" class="show-grid">
-          <div 
-            v-for="show in latestShows" 
-            :key="show.id"
-            class="show-card"
-            @click="goToShow(show.id)"
+          <div
+              v-for="show in latestShows"
+              :key="show.id"
+              class="show-card"
+              @click="goToShow(show.id)"
           >
             <div class="show-image">
-              <img :src="show.image" :alt="show.title" />
+              <img :src="show.image" :alt="show.title"/>
               <div class="show-tags">
                 <span v-if="show.isHot" class="tag tag-hot">热门</span>
                 <span v-if="show.isNew" class="tag tag-new">新品</span>
@@ -143,21 +145,17 @@
         </div>
       </div>
     </div>
-    
-    <Footer />
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
 
 export default {
   name: 'Home',
   components: {
-    Header,
-    Footer
+    Header
   },
   data() {
     return {
@@ -185,14 +183,14 @@ export default {
         }
       ],
       categories: [
-        { id: 1, name: '演唱会', icon: 'el-icon-microphone', path: '/category/concert' },
-        { id: 2, name: '话剧', icon: 'el-icon-video-camera', path: '/category/drama' },
-        { id: 3, name: '音乐剧', icon: 'el-icon-headset', path: '/category/musical' },
-        { id: 4, name: '戏曲', icon: 'el-icon-trophy', path: '/category/opera' },
-        { id: 5, name: '儿童剧', icon: 'el-icon-star-on', path: '/category/children' },
-        { id: 6, name: '展览', icon: 'el-icon-picture', path: '/category/exhibition' },
-        { id: 7, name: '音乐会', icon: 'el-icon-service', path: '/category/classical' },
-        { id: 8, name: '舞蹈', icon: 'el-icon-user', path: '/category/dance' }
+        {id: 1, name: '演唱会', icon: 'el-icon-microphone', path: '/category/concert'},
+        {id: 2, name: '话剧', icon: 'el-icon-video-camera', path: '/category/drama'},
+        {id: 3, name: '音乐剧', icon: 'el-icon-headset', path: '/category/musical'},
+        {id: 4, name: '戏曲', icon: 'el-icon-trophy', path: '/category/opera'},
+        {id: 5, name: '儿童剧', icon: 'el-icon-star-on', path: '/category/children'},
+        {id: 6, name: '展览', icon: 'el-icon-picture', path: '/category/exhibition'},
+        {id: 7, name: '音乐会', icon: 'el-icon-service', path: '/category/classical'},
+        {id: 8, name: '舞蹈', icon: 'el-icon-user', path: '/category/dance'}
       ],
       hotShows: [],
       recommendedShows: [],
@@ -207,19 +205,19 @@ export default {
   },
   methods: {
     ...mapActions('show', ['getShowList']),
-    
+
     async loadShows() {
       try {
         // 获取热门演出
-        const hotResponse = await this.getShowList({ category: 'hot', limit: 8 })
+        const hotResponse = await this.getShowList({category: 'hot', limit: 8})
         this.hotShows = hotResponse.data || this.getMockShows('hot')
-        
+
         // 获取推荐演出
-        const recommendedResponse = await this.getShowList({ category: 'recommended', limit: 8 })
+        const recommendedResponse = await this.getShowList({category: 'recommended', limit: 8})
         this.recommendedShows = recommendedResponse.data || this.getMockShows('recommended')
-        
+
         // 获取最新演出
-        const latestResponse = await this.getShowList({ category: 'latest', limit: 8 })
+        const latestResponse = await this.getShowList({category: 'latest', limit: 8})
         this.latestShows = latestResponse.data || this.getMockShows('latest')
       } catch (error) {
         console.error('加载演出数据失败:', error)
@@ -229,7 +227,7 @@ export default {
         this.latestShows = this.getMockShows('latest')
       }
     },
-    
+
     getMockShows(type) {
       const mockShows = [
         {
@@ -273,14 +271,14 @@ export default {
           isNew: false
         }
       ]
-      
+
       return mockShows.slice(0, 4)
     },
-    
+
     goToShow(showId) {
       this.$router.push(`/show/${showId}`)
     },
-    
+
     goToCategory(path) {
       this.$router.push(path)
     }
@@ -291,11 +289,12 @@ export default {
 <style lang="scss" scoped>
 .home {
   min-height: 100vh;
+  padding-bottom: 5vh;
 }
 
 .banner-section {
   margin-bottom: 40px;
-  
+
   .banner-item {
     height: 400px;
     background-size: cover;
@@ -304,7 +303,7 @@ export default {
     display: flex;
     align-items: center;
     position: relative;
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -314,7 +313,7 @@ export default {
       bottom: 0;
       background: rgba(0, 0, 0, 0.4);
     }
-    
+
     .banner-content {
       position: relative;
       z-index: 1;
@@ -322,13 +321,13 @@ export default {
       text-align: center;
       width: 100%;
       padding: 0 20px;
-      
+
       h2 {
         font-size: 36px;
         margin-bottom: 15px;
         font-weight: bold;
       }
-      
+
       p {
         font-size: 18px;
         margin-bottom: 30px;
@@ -340,13 +339,13 @@ export default {
 
 .category-section {
   margin-bottom: 40px;
-  
+
   .category-grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     gap: 20px;
   }
-  
+
   .category-item {
     display: flex;
     flex-direction: column;
@@ -357,18 +356,18 @@ export default {
     box-shadow: $box-shadow-light;
     cursor: pointer;
     transition: $transition-base;
-    
+
     &:hover {
       transform: translateY(-5px);
       box-shadow: $box-shadow-dark;
     }
-    
+
     i {
       font-size: 32px;
       color: $primary-color;
       margin-bottom: 10px;
     }
-    
+
     span {
       font-size: $font-size-base;
       color: $text-primary;
@@ -379,42 +378,42 @@ export default {
 
 .section {
   margin-bottom: 60px;
-  
+
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    
+
     h2 {
       font-size: 28px;
       color: $text-primary;
       font-weight: bold;
     }
-    
+
     .more-link {
       color: $primary-color;
       text-decoration: none;
       font-size: $font-size-base;
       display: flex;
       align-items: center;
-      
+
       &:hover {
         text-decoration: underline;
       }
-      
+
       i {
         margin-left: 5px;
       }
     }
   }
-  
+
   .show-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
   }
-  
+
   .show-card {
     background: #fff;
     border-radius: $border-radius-large;
@@ -422,24 +421,24 @@ export default {
     box-shadow: $box-shadow-light;
     cursor: pointer;
     transition: $transition-base;
-    
+
     &:hover {
       transform: translateY(-5px);
       box-shadow: $box-shadow-dark;
     }
-    
+
     .show-image {
       position: relative;
       height: 200px;
       overflow: hidden;
-      
+
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: $transition-base;
       }
-      
+
       .show-tags {
         position: absolute;
         top: 10px;
@@ -448,10 +447,10 @@ export default {
         gap: 5px;
       }
     }
-    
+
     .show-info {
       padding: 15px;
-      
+
       .show-title {
         font-size: $font-size-medium;
         color: $text-primary;
@@ -464,29 +463,29 @@ export default {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
-      
+
       .show-venue {
         font-size: $font-size-small;
         color: $text-secondary;
         margin-bottom: 5px;
       }
-      
+
       .show-time {
         font-size: $font-size-small;
         color: $text-secondary;
         margin-bottom: 10px;
       }
-      
+
       .show-price {
         display: flex;
         align-items: baseline;
-        
+
         .price {
           color: $primary-color;
           font-size: $font-size-large;
           font-weight: bold;
         }
-        
+
         .price-desc {
           color: $text-secondary;
           font-size: $font-size-small;
@@ -496,45 +495,4 @@ export default {
     }
   }
 }
-
-// 响应式设计
-@media (max-width: 1024px) {
-  .show-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-  
-  .category-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .show-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
-  .category-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  
-  .banner-item .banner-content {
-    h2 {
-      font-size: 24px;
-    }
-    
-    p {
-      font-size: 16px;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .show-grid {
-    grid-template-columns: 1fr !important;
-  }
-  
-  .category-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-</style> 
+</style>

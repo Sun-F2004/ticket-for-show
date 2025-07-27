@@ -8,10 +8,10 @@ import order from './modules/order'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  modules: {
-    user,
-    show,
-    cart,
-    order
-  }
-}) 
+    modules: {
+        user,
+        show,
+        cart,
+        order
+    }
+})

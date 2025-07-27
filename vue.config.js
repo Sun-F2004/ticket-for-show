@@ -5,8 +5,9 @@ module.exports = defineConfig({
   devServer: {
     port: 8080,
     proxy: {
+      // 允许跨域
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.VUE_APP_BASE_API,
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
@@ -21,4 +22,4 @@ module.exports = defineConfig({
       }
     }
   }
-}) 
+})

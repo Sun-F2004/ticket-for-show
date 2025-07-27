@@ -1,13 +1,13 @@
 <template>
   <div class="order-page">
-    <Header />
-    
+    <Header/>
+
     <div class="order-container">
       <div class="container">
         <div class="order-header">
           <h1>确认订单</h1>
         </div>
-        
+
         <div v-loading="loading" class="order-content">
           <!-- 订单商品 -->
           <div class="order-items">
@@ -15,7 +15,7 @@
             <div class="items-list">
               <div v-for="item in orderItems" :key="item.id" class="order-item">
                 <div class="item-image">
-                  <img :src="item.image" :alt="item.title" />
+                  <img :src="item.image" :alt="item.title"/>
                 </div>
                 <div class="item-info">
                   <h3 class="item-title">{{ item.title }}</h3>
@@ -35,28 +35,28 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 联系人信息 -->
           <div class="contact-info">
             <h2>联系人信息</h2>
             <el-form
-              ref="contactForm"
-              :model="contactForm"
-              :rules="contactRules"
-              label-width="100px"
+                ref="contactForm"
+                :model="contactForm"
+                :rules="contactRules"
+                label-width="100px"
             >
               <el-form-item label="联系人" prop="name">
-                <el-input v-model="contactForm.name" placeholder="请输入联系人姓名" />
+                <el-input v-model="contactForm.name" placeholder="请输入联系人姓名"/>
               </el-form-item>
               <el-form-item label="手机号" prop="phone">
-                <el-input v-model="contactForm.phone" placeholder="请输入手机号" />
+                <el-input v-model="contactForm.phone" placeholder="请输入手机号"/>
               </el-form-item>
               <el-form-item label="邮箱" prop="email">
-                <el-input v-model="contactForm.email" placeholder="请输入邮箱" />
+                <el-input v-model="contactForm.email" placeholder="请输入邮箱"/>
               </el-form-item>
             </el-form>
           </div>
-          
+
           <!-- 支付方式 -->
           <div class="payment-method">
             <h2>支付方式</h2>
@@ -77,18 +77,18 @@
               </el-radio-group>
             </div>
           </div>
-          
+
           <!-- 订单备注 -->
           <div class="order-remark">
             <h2>订单备注</h2>
             <el-input
-              v-model="orderRemark"
-              type="textarea"
-              :rows="3"
-              placeholder="请输入订单备注（选填）"
+                v-model="orderRemark"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入订单备注（选填）"
             />
           </div>
-          
+
           <!-- 订单金额 -->
           <div class="order-amount">
             <div class="amount-item">
@@ -104,14 +104,14 @@
               <span class="final-amount">¥{{ finalAmount }}</span>
             </div>
           </div>
-          
+
           <!-- 提交订单 -->
           <div class="order-submit">
             <el-button
-              type="primary"
-              size="large"
-              :loading="submitting"
-              @click="submitOrder"
+                type="primary"
+                size="large"
+                :loading="submitting"
+                @click="submitOrder"
             >
               提交订单
             </el-button>
@@ -119,21 +119,17 @@
         </div>
       </div>
     </div>
-    
-    <Footer />
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
 
 export default {
   name: 'Order',
   components: {
-    Header,
-    Footer
+    Header
   },
   data() {
     return {
@@ -145,15 +141,15 @@ export default {
       },
       contactRules: {
         name: [
-          { required: true, message: '请输入联系人姓名', trigger: 'blur' }
+          {required: true, message: '请输入联系人姓名', trigger: 'blur'}
         ],
         phone: [
-          { required: true, message: '请输入手机号', trigger: 'blur' },
-          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+          {required: true, message: '请输入手机号', trigger: 'blur'},
+          {pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur'}
         ],
         email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+          {required: true, message: '请输入邮箱', trigger: 'blur'},
+          {type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur'}
         ]
       },
       paymentMethod: 'alipay',
@@ -164,17 +160,17 @@ export default {
   computed: {
     ...mapGetters('order', ['loading']),
     ...mapGetters('user', ['userInfo']),
-    
+
     totalAmount() {
       return this.orderItems.reduce((total, item) => {
         return total + (item.price * item.quantity)
       }, 0)
     },
-    
+
     serviceFee() {
       return Math.round(this.totalAmount * 0.05) // 5%服务费
     },
-    
+
     finalAmount() {
       return this.totalAmount + this.serviceFee
     }
@@ -184,10 +180,10 @@ export default {
   },
   methods: {
     ...mapActions('order', ['createOrder']),
-    
+
     async loadOrderData() {
-      const { showId, sessionId, from, items } = this.$route.query
-      
+      const {showId, sessionId, from, items} = this.$route.query
+
       if (from === 'cart' && items) {
         // 从购物车来的订单
         this.orderItems = this.getCartItems(items.split(','))
@@ -199,7 +195,7 @@ export default {
         this.$router.push('/')
         return
       }
-      
+
       // 预填联系人信息
       if (this.userInfo) {
         this.contactForm.name = this.userInfo.name || ''
@@ -207,7 +203,7 @@ export default {
         this.contactForm.email = this.userInfo.email || ''
       }
     },
-    
+
     getCartItems(itemIds) {
       // 这里应该从购物车获取商品信息
       // 暂时使用模拟数据
@@ -234,7 +230,7 @@ export default {
         }
       ]
     },
-    
+
     getDirectOrderItem(showId, sessionId) {
       // 这里应该根据showId和sessionId获取商品信息
       // 暂时使用模拟数据
@@ -249,14 +245,14 @@ export default {
         image: 'https://via.placeholder.com/100x100/ff6b35/ffffff?text=演唱会'
       }
     },
-    
+
     async submitOrder() {
       try {
         const valid = await this.$refs.contactForm.validate()
         if (!valid) return
-        
+
         this.submitting = true
-        
+
         const orderData = {
           items: this.orderItems,
           contact: this.contactForm,
@@ -266,15 +262,15 @@ export default {
           serviceFee: this.serviceFee,
           finalAmount: this.finalAmount
         }
-        
+
         const response = await this.createOrder(orderData)
-        
+
         this.$message.success('订单提交成功')
-        
+
         // 跳转到支付页面或订单详情页
         this.$router.push({
           path: '/user',
-          query: { tab: 'orders' }
+          query: {tab: 'orders'}
         })
       } catch (error) {
         this.$message.error(error.message || '订单提交失败')
@@ -298,7 +294,7 @@ export default {
 
 .order-header {
   margin-bottom: 30px;
-  
+
   h1 {
     font-size: 32px;
     color: $text-primary;
@@ -316,7 +312,7 @@ export default {
   border-radius: $border-radius-large;
   padding: 30px;
   box-shadow: $box-shadow-light;
-  
+
   h2 {
     font-size: 20px;
     color: $text-primary;
@@ -333,11 +329,11 @@ export default {
     padding: 20px 0;
     border-bottom: 1px solid $border-color-light;
     gap: 15px;
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     .item-image {
       img {
         width: 80px;
@@ -346,7 +342,7 @@ export default {
         border-radius: $border-radius-base;
       }
     }
-    
+
     .item-info {
       .item-title {
         font-size: $font-size-medium;
@@ -355,14 +351,14 @@ export default {
         font-weight: 600;
         line-height: 1.4;
       }
-      
+
       .item-venue, .item-time, .item-session {
         font-size: $font-size-small;
         color: $text-secondary;
         margin-bottom: 5px;
       }
     }
-    
+
     .item-price {
       .price {
         color: $primary-color;
@@ -370,12 +366,12 @@ export default {
         font-weight: bold;
       }
     }
-    
+
     .item-quantity {
       text-align: center;
       color: $text-regular;
     }
-    
+
     .item-total {
       .total-price {
         color: $primary-color;
@@ -390,11 +386,11 @@ export default {
   .el-radio-group {
     display: flex;
     gap: 30px;
-    
+
     .el-radio {
       display: flex;
       align-items: center;
-      
+
       i {
         margin-right: 8px;
         font-size: 18px;
@@ -410,16 +406,16 @@ export default {
     align-items: center;
     padding: 15px 0;
     border-bottom: 1px solid $border-color-light;
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     &.total {
       font-size: $font-size-large;
       font-weight: bold;
       color: $text-primary;
-      
+
       .final-amount {
         color: $primary-color;
         font-size: $font-size-extra-large;
@@ -430,7 +426,7 @@ export default {
 
 .order-submit {
   text-align: center;
-  
+
   .el-button {
     width: 200px;
     height: 50px;
@@ -446,21 +442,21 @@ export default {
       grid-template-columns: 1fr;
       gap: 10px;
       text-align: center;
-      
+
       .item-image {
         justify-self: center;
       }
-      
+
       .item-quantity {
         order: 4;
       }
-      
+
       .item-total {
         order: 5;
       }
     }
   }
-  
+
   .payment-options {
     .el-radio-group {
       flex-direction: column;
@@ -468,4 +464,4 @@ export default {
     }
   }
 }
-</style> 
+</style>

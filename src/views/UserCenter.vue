@@ -1,7 +1,7 @@
 <template>
   <div class="user-center">
-    <Header />
-    
+    <Header/>
+
     <div class="user-container">
       <div class="container">
         <div class="user-content">
@@ -14,11 +14,11 @@
               <h3>{{ userInfo.username || '用户' }}</h3>
               <p>{{ userInfo.email || '未设置邮箱' }}</p>
             </div>
-            
+
             <el-menu
-              :default-active="activeMenu"
-              class="user-menu"
-              @select="handleMenuSelect"
+                :default-active="activeMenu"
+                class="user-menu"
+                @select="handleMenuSelect"
             >
               <el-menu-item index="profile">
                 <i class="el-icon-user"></i>
@@ -42,29 +42,29 @@
               </el-menu-item>
             </el-menu>
           </div>
-          
+
           <!-- 主内容区 -->
           <div class="user-main">
             <!-- 个人资料 -->
             <div v-if="activeMenu === 'profile'" class="profile-section">
               <h2>个人资料</h2>
               <el-form
-                ref="profileForm"
-                :model="profileForm"
-                :rules="profileRules"
-                label-width="100px"
+                  ref="profileForm"
+                  :model="profileForm"
+                  :rules="profileRules"
+                  label-width="100px"
               >
                 <el-form-item label="用户名" prop="username">
-                  <el-input v-model="profileForm.username" />
+                  <el-input v-model="profileForm.username"/>
                 </el-form-item>
                 <el-form-item label="真实姓名" prop="realName">
-                  <el-input v-model="profileForm.realName" />
+                  <el-input v-model="profileForm.realName"/>
                 </el-form-item>
                 <el-form-item label="手机号" prop="phone">
-                  <el-input v-model="profileForm.phone" />
+                  <el-input v-model="profileForm.phone"/>
                 </el-form-item>
                 <el-form-item label="邮箱" prop="email">
-                  <el-input v-model="profileForm.email" />
+                  <el-input v-model="profileForm.email"/>
                 </el-form-item>
                 <el-form-item label="性别" prop="gender">
                   <el-radio-group v-model="profileForm.gender">
@@ -75,9 +75,9 @@
                 </el-form-item>
                 <el-form-item label="生日" prop="birthday">
                   <el-date-picker
-                    v-model="profileForm.birthday"
-                    type="date"
-                    placeholder="选择生日"
+                      v-model="profileForm.birthday"
+                      type="date"
+                      placeholder="选择生日"
                   />
                 </el-form-item>
                 <el-form-item>
@@ -85,20 +85,20 @@
                 </el-form-item>
               </el-form>
             </div>
-            
+
             <!-- 我的订单 -->
             <div v-if="activeMenu === 'orders'" class="orders-section">
               <h2>我的订单</h2>
               <div class="order-tabs">
                 <el-tabs v-model="orderTab" @tab-click="handleOrderTabClick">
-                  <el-tab-pane label="全部" name="all" />
-                  <el-tab-pane label="待付款" name="unpaid" />
-                  <el-tab-pane label="待发货" name="unshipped" />
-                  <el-tab-pane label="已完成" name="completed" />
-                  <el-tab-pane label="已取消" name="cancelled" />
+                  <el-tab-pane label="全部" name="all"/>
+                  <el-tab-pane label="待付款" name="unpaid"/>
+                  <el-tab-pane label="待发货" name="unshipped"/>
+                  <el-tab-pane label="已完成" name="completed"/>
+                  <el-tab-pane label="已取消" name="cancelled"/>
                 </el-tabs>
               </div>
-              
+
               <div v-loading="orderLoading" class="orders-list">
                 <div v-for="order in orderList" :key="order.id" class="order-item">
                   <div class="order-header">
@@ -107,7 +107,7 @@
                   </div>
                   <div class="order-content">
                     <div v-for="item in order.items" :key="item.id" class="order-product">
-                      <img :src="item.image" :alt="item.title" />
+                      <img :src="item.image" :alt="item.title"/>
                       <div class="product-info">
                         <h4>{{ item.title }}</h4>
                         <p>{{ item.venue }} | {{ item.time }}</p>
@@ -137,13 +137,13 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- 我的收藏 -->
             <div v-if="activeMenu === 'favorites'" class="favorites-section">
               <h2>我的收藏</h2>
               <div class="favorites-grid">
                 <div v-for="show in favorites" :key="show.id" class="favorite-item">
-                  <img :src="show.image" :alt="show.title" />
+                  <img :src="show.image" :alt="show.title"/>
                   <div class="favorite-info">
                     <h4>{{ show.title }}</h4>
                     <p>{{ show.venue }}</p>
@@ -160,7 +160,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- 收货地址 -->
             <div v-if="activeMenu === 'address'" class="address-section">
               <h2>收货地址</h2>
@@ -186,7 +186,7 @@
                 </el-button>
               </div>
             </div>
-            
+
             <!-- 账户安全 -->
             <div v-if="activeMenu === 'security'" class="security-section">
               <h2>账户安全</h2>
@@ -218,21 +218,17 @@
         </div>
       </div>
     </div>
-    
-    <Footer />
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import {mapGetters, mapActions} from 'vuex'
 import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
 
 export default {
   name: 'UserCenter',
   components: {
-    Header,
-    Footer
+    Header
   },
   data() {
     return {
@@ -249,13 +245,13 @@ export default {
       },
       profileRules: {
         username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+          {required: true, message: '请输入用户名', trigger: 'blur'}
         ],
         phone: [
-          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+          {pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur'}
         ],
         email: [
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+          {type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur'}
         ]
       },
       orderList: [],
@@ -284,30 +280,30 @@ export default {
   methods: {
     ...mapActions('user', ['updateUserInfo']),
     ...mapActions('order', ['getOrderList']),
-    
+
     handleMenuSelect(key) {
       this.activeMenu = key
-      this.$router.push({ query: { tab: key } })
+      this.$router.push({query: {tab: key}})
     },
-    
+
     async loadUserData() {
       // 加载用户数据
-      this.profileForm = { ...this.userInfo }
-      
+      this.profileForm = {...this.userInfo}
+
       // 加载订单数据
       await this.loadOrders()
-      
+
       // 加载收藏数据
       this.loadFavorites()
-      
+
       // 加载地址数据
       this.loadAddresses()
     },
-    
+
     async loadOrders() {
       this.orderLoading = true
       try {
-        const response = await this.getOrderList({ status: this.orderTab })
+        const response = await this.getOrderList({status: this.orderTab})
         this.orderList = response.data || this.getMockOrders()
       } catch (error) {
         console.error('加载订单失败:', error)
@@ -316,7 +312,7 @@ export default {
         this.orderLoading = false
       }
     },
-    
+
     getMockOrders() {
       return [
         {
@@ -338,7 +334,7 @@ export default {
         }
       ]
     },
-    
+
     loadFavorites() {
       this.favorites = [
         {
@@ -350,7 +346,7 @@ export default {
         }
       ]
     },
-    
+
     loadAddresses() {
       this.addresses = [
         {
@@ -364,7 +360,7 @@ export default {
         }
       ]
     },
-    
+
     getOrderStatusText(status) {
       const statusMap = {
         unpaid: '待付款',
@@ -374,7 +370,7 @@ export default {
       }
       return statusMap[status] || status
     },
-    
+
     async updateProfile() {
       try {
         await this.updateUserInfo(this.profileForm)
@@ -383,11 +379,11 @@ export default {
         this.$message.error('更新失败')
       }
     },
-    
+
     handleOrderTabClick() {
       this.loadOrders()
     },
-    
+
     cancelOrder(orderId) {
       this.$confirm('确定要取消这个订单吗？', '提示', {
         confirmButtonText: '确定',
@@ -398,15 +394,15 @@ export default {
         this.loadOrders()
       })
     },
-    
+
     viewOrderDetail(orderId) {
       this.$message.info('订单详情功能开发中')
     },
-    
+
     goToShow(showId) {
       this.$router.push(`/show/${showId}`)
     },
-    
+
     removeFavorite(showId) {
       this.$confirm('确定要取消收藏吗？', '提示', {
         confirmButtonText: '确定',
@@ -417,15 +413,15 @@ export default {
         this.$message.success('已取消收藏')
       })
     },
-    
+
     addAddress() {
       this.$message.info('添加地址功能开发中')
     },
-    
+
     editAddress(address) {
       this.$message.info('编辑地址功能开发中')
     },
-    
+
     deleteAddress(addressId) {
       this.$confirm('确定要删除这个地址吗？', '提示', {
         confirmButtonText: '确定',
@@ -436,15 +432,15 @@ export default {
         this.$message.success('地址已删除')
       })
     },
-    
+
     changePassword() {
       this.$message.info('修改密码功能开发中')
     },
-    
+
     bindPhone() {
       this.$message.info('绑定手机功能开发中')
     },
-    
+
     bindEmail() {
       this.$message.info('绑定邮箱功能开发中')
     }
@@ -479,7 +475,7 @@ export default {
   padding: 30px 20px;
   text-align: center;
   border-bottom: 1px solid $border-color-light;
-  
+
   .avatar {
     width: 80px;
     height: 80px;
@@ -489,19 +485,19 @@ export default {
     align-items: center;
     justify-content: center;
     margin: 0 auto 15px;
-    
+
     i {
       font-size: 40px;
       color: #fff;
     }
   }
-  
+
   h3 {
     font-size: $font-size-large;
     color: $text-primary;
     margin-bottom: 5px;
   }
-  
+
   p {
     color: $text-secondary;
     font-size: $font-size-small;
@@ -510,11 +506,11 @@ export default {
 
 .user-menu {
   border: none;
-  
+
   .el-menu-item {
     height: 50px;
     line-height: 50px;
-    
+
     i {
       margin-right: 10px;
     }
@@ -526,7 +522,7 @@ export default {
   border-radius: $border-radius-large;
   padding: 30px;
   box-shadow: $box-shadow-light;
-  
+
   h2 {
     font-size: 24px;
     color: $text-primary;
@@ -539,14 +535,14 @@ export default {
   .order-tabs {
     margin-bottom: 20px;
   }
-  
+
   .orders-list {
     .order-item {
       border: 1px solid $border-color-light;
       border-radius: $border-radius-base;
       margin-bottom: 20px;
       overflow: hidden;
-      
+
       .order-header {
         display: flex;
         justify-content: space-between;
@@ -554,30 +550,30 @@ export default {
         padding: 15px 20px;
         background: $background-color-light;
         border-bottom: 1px solid $border-color-light;
-        
+
         .order-number {
           font-weight: 600;
           color: $text-primary;
         }
-        
+
         .order-status {
           color: $primary-color;
           font-weight: 600;
         }
       }
-      
+
       .order-content {
         padding: 20px;
-        
+
         .order-product {
           display: flex;
           align-items: center;
           margin-bottom: 15px;
-          
+
           &:last-child {
             margin-bottom: 0;
           }
-          
+
           img {
             width: 60px;
             height: 60px;
@@ -585,30 +581,30 @@ export default {
             border-radius: $border-radius-base;
             margin-right: 15px;
           }
-          
+
           .product-info {
             flex: 1;
-            
+
             h4 {
               font-size: $font-size-medium;
               color: $text-primary;
               margin-bottom: 5px;
             }
-            
+
             p {
               font-size: $font-size-small;
               color: $text-secondary;
               margin-bottom: 3px;
             }
           }
-          
+
           .product-price {
             color: $primary-color;
             font-weight: bold;
           }
         }
       }
-      
+
       .order-footer {
         display: flex;
         justify-content: space-between;
@@ -616,7 +612,7 @@ export default {
         padding: 15px 20px;
         background: $background-color-light;
         border-top: 1px solid $border-color-light;
-        
+
         .order-total {
           .total-price {
             color: $primary-color;
@@ -624,7 +620,7 @@ export default {
             font-weight: bold;
           }
         }
-        
+
         .order-actions {
           display: flex;
           gap: 10px;
@@ -639,33 +635,33 @@ export default {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
-    
+
     .favorite-item {
       border: 1px solid $border-color-light;
       border-radius: $border-radius-base;
       overflow: hidden;
-      
+
       img {
         width: 100%;
         height: 150px;
         object-fit: cover;
       }
-      
+
       .favorite-info {
         padding: 15px;
-        
+
         h4 {
           font-size: $font-size-medium;
           color: $text-primary;
           margin-bottom: 8px;
         }
-        
+
         p {
           font-size: $font-size-small;
           color: $text-secondary;
           margin-bottom: 5px;
         }
-        
+
         .favorite-actions {
           display: flex;
           gap: 10px;
@@ -686,21 +682,21 @@ export default {
       border: 1px solid $border-color-light;
       border-radius: $border-radius-base;
       margin-bottom: 15px;
-      
+
       .address-info {
         h4 {
           font-size: $font-size-medium;
           color: $text-primary;
           margin-bottom: 8px;
         }
-        
+
         p {
           font-size: $font-size-small;
           color: $text-secondary;
           margin-bottom: 5px;
         }
       }
-      
+
       .address-actions {
         display: flex;
         gap: 10px;
@@ -719,14 +715,14 @@ export default {
       border: 1px solid $border-color-light;
       border-radius: $border-radius-base;
       margin-bottom: 15px;
-      
+
       .security-info {
         h4 {
           font-size: $font-size-medium;
           color: $text-primary;
           margin-bottom: 5px;
         }
-        
+
         p {
           font-size: $font-size-small;
           color: $text-secondary;
@@ -741,11 +737,11 @@ export default {
   .user-content {
     grid-template-columns: 1fr;
   }
-  
+
   .favorites-grid {
     grid-template-columns: 1fr !important;
   }
-  
+
   .order-item {
     .order-footer {
       flex-direction: column;
@@ -754,4 +750,4 @@ export default {
     }
   }
 }
-</style> 
+</style>

@@ -11,64 +11,64 @@ import Cart from '../views/Cart.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: Register
-  },
-  {
-    path: '/show/:id',
-    name: 'ShowDetail',
-    component: ShowDetail
-  },
-  {
-    path: '/order',
-    name: 'Order',
-    component: Order,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/user',
-    name: 'UserCenter',
-    component: UserCenter,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/cart',
-    name: 'Cart',
-    component: Cart,
-    meta: { requiresAuth: true }
-  }
+    {
+        path: '/',
+        name: 'Home',
+        component: Home
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: Login
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register
+    },
+    {
+        path: '/show/:id',
+        name: 'ShowDetail',
+        component: ShowDetail
+    },
+    {
+        path: '/order',
+        name: 'Order',
+        component: Order,
+        meta: {requiresAuth: true}
+    },
+    {
+        path: '/user',
+        name: 'UserCenter',
+        component: UserCenter,
+        meta: {requiresAuth: true}
+    },
+    {
+        path: '/cart',
+        name: 'Cart',
+        component: Cart,
+        meta: {requiresAuth: true}
+    }
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
 })
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!token) {
-      next('/login')
+    const token = system.token
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!token) {
+            next('/login')
+        } else {
+            next()
+        }
     } else {
-      next()
+        next()
     }
-  } else {
-    next()
-  }
 })
 
-export default router 
+export default router

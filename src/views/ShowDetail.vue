@@ -1,7 +1,7 @@
 <template>
   <div class="show-detail">
-    <Header />
-    
+    <Header/>
+
     <div class="detail-container">
       <div class="container">
         <div v-loading="loading" class="detail-content">
@@ -13,17 +13,17 @@
             </el-breadcrumb-item>
             <el-breadcrumb-item>{{ showDetail.title }}</el-breadcrumb-item>
           </el-breadcrumb>
-          
+
           <!-- 演出基本信息 -->
           <div class="show-info-section">
             <div class="show-image">
-              <img :src="showDetail.image" :alt="showDetail.title" />
+              <img :src="showDetail.image" :alt="showDetail.title"/>
               <div class="show-tags">
                 <span v-if="showDetail.isHot" class="tag tag-hot">热门</span>
                 <span v-if="showDetail.isNew" class="tag tag-new">新品</span>
               </div>
             </div>
-            
+
             <div class="show-info">
               <h1 class="show-title">{{ showDetail.title }}</h1>
               <div class="show-meta">
@@ -44,12 +44,12 @@
                   <span>票价：¥{{ showDetail.minPrice }} - ¥{{ showDetail.maxPrice }}</span>
                 </div>
               </div>
-              
+
               <div class="show-description">
                 <h3>演出介绍</h3>
                 <p>{{ showDetail.description }}</p>
               </div>
-              
+
               <div class="show-actions">
                 <el-button type="primary" size="large" @click="goToBooking">
                   <i class="el-icon-tickets"></i>
@@ -66,17 +66,17 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 场次选择 -->
           <div class="sessions-section">
             <h2>选择场次</h2>
             <div class="sessions-list">
               <div
-                v-for="session in sessions"
-                :key="session.id"
-                class="session-item"
-                :class="{ active: selectedSession?.id === session.id }"
-                @click="selectSession(session)"
+                  v-for="session in sessions"
+                  :key="session.id"
+                  class="session-item"
+                  :class="{ active: selectedSession?.id === session.id }"
+                  @click="selectSession(session)"
               >
                 <div class="session-info">
                   <div class="session-time">{{ session.time }}</div>
@@ -94,7 +94,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 座位选择 -->
           <div v-if="selectedSession" class="seats-section">
             <h2>选择座位</h2>
@@ -110,7 +110,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 演出详情 -->
           <div class="detail-tabs">
             <el-tabs v-model="activeTab">
@@ -145,21 +145,17 @@
         </div>
       </div>
     </div>
-    
-    <Footer />
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
 
 export default {
   name: 'ShowDetail',
   components: {
-    Header,
-    Footer
+    Header
   },
   data() {
     return {
@@ -181,7 +177,7 @@ export default {
   methods: {
     ...mapActions('show', ['getShowDetail', 'getShowSessions']),
     ...mapActions('cart', ['addToCart']),
-    
+
     async loadShowDetail(showId) {
       try {
         const response = await this.getShowDetail(showId)
@@ -191,7 +187,7 @@ export default {
         this.showDetail = this.getMockShowDetail()
       }
     },
-    
+
     async loadSessions(showId) {
       try {
         const response = await this.getShowSessions(showId)
@@ -207,7 +203,7 @@ export default {
         }
       }
     },
-    
+
     getMockShowDetail() {
       return {
         id: this.$route.params.id,
@@ -225,7 +221,7 @@ export default {
         detailContent: '<p>演出详情内容...</p>'
       }
     },
-    
+
     getMockSessions() {
       return [
         {
@@ -246,7 +242,7 @@ export default {
         }
       ]
     },
-    
+
     getCategoryName(category) {
       const categoryMap = {
         concert: '演唱会',
@@ -258,11 +254,11 @@ export default {
       }
       return categoryMap[category] || '演出'
     },
-    
+
     selectSession(session) {
       this.selectedSession = session
     },
-    
+
     goToBooking() {
       if (!this.selectedSession) {
         this.$message.warning('请先选择场次')
@@ -276,13 +272,13 @@ export default {
         }
       })
     },
-    
+
     async addToCart() {
       if (!this.selectedSession) {
         this.$message.warning('请先选择场次')
         return
       }
-      
+
       try {
         await this.addToCart({
           showId: this.showDetail.id,
@@ -294,7 +290,7 @@ export default {
         this.$message.error('添加到购物车失败')
       }
     },
-    
+
     toggleFavorite() {
       this.isFavorite = !this.isFavorite
       this.$message.success(this.isFavorite ? '已收藏' : '已取消收藏')
@@ -330,14 +326,14 @@ export default {
 
 .show-image {
   position: relative;
-  
+
   img {
     width: 100%;
     height: 300px;
     object-fit: cover;
     border-radius: $border-radius-base;
   }
-  
+
   .show-tags {
     position: absolute;
     top: 10px;
@@ -354,51 +350,51 @@ export default {
     margin-bottom: 20px;
     font-weight: bold;
   }
-  
+
   .show-meta {
     margin-bottom: 20px;
-    
+
     .meta-item {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
-      
+
       i {
         color: $primary-color;
         margin-right: 10px;
         width: 16px;
       }
-      
+
       span {
         color: $text-regular;
         font-size: $font-size-base;
       }
     }
   }
-  
+
   .show-description {
     margin-bottom: 30px;
-    
+
     h3 {
       font-size: $font-size-large;
       color: $text-primary;
       margin-bottom: 10px;
     }
-    
+
     p {
       color: $text-regular;
       line-height: 1.6;
     }
   }
-  
+
   .show-actions {
     display: flex;
     gap: 15px;
-    
+
     .el-button {
       flex: 1;
       height: 45px;
-      
+
       i {
         margin-right: 5px;
       }
@@ -412,19 +408,19 @@ export default {
   padding: 30px;
   margin-bottom: 30px;
   box-shadow: $box-shadow-light;
-  
+
   h2 {
     font-size: 24px;
     color: $text-primary;
     margin-bottom: 20px;
   }
-  
+
   .sessions-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .session-item {
     display: flex;
     align-items: center;
@@ -434,12 +430,12 @@ export default {
     border-radius: $border-radius-base;
     cursor: pointer;
     transition: $transition-base;
-    
+
     &:hover, &.active {
       border-color: $primary-color;
       background: rgba($primary-color, 0.05);
     }
-    
+
     .session-info {
       .session-time {
         font-size: $font-size-medium;
@@ -447,20 +443,20 @@ export default {
         font-weight: 600;
         margin-bottom: 5px;
       }
-      
+
       .session-venue {
         font-size: $font-size-small;
         color: $text-secondary;
       }
     }
-    
+
     .session-price {
       .price {
         color: $primary-color;
         font-size: $font-size-large;
         font-weight: bold;
       }
-      
+
       .price-desc {
         color: $text-secondary;
         font-size: $font-size-small;
@@ -476,13 +472,13 @@ export default {
   padding: 30px;
   margin-bottom: 30px;
   box-shadow: $box-shadow-light;
-  
+
   h2 {
     font-size: 24px;
     color: $text-primary;
     margin-bottom: 20px;
   }
-  
+
   .seats-container {
     .stage {
       text-align: center;
@@ -493,19 +489,19 @@ export default {
       margin-bottom: 20px;
       font-weight: bold;
     }
-    
+
     .seats-map {
       .seats-placeholder {
         text-align: center;
         padding: 60px 20px;
         color: $text-secondary;
-        
+
         i {
           font-size: 48px;
           margin-bottom: 20px;
           display: block;
         }
-        
+
         p {
           margin: 10px 0;
           font-size: $font-size-base;
@@ -520,17 +516,17 @@ export default {
   border-radius: $border-radius-large;
   padding: 30px;
   box-shadow: $box-shadow-light;
-  
+
   .detail-content, .notice-content, .refund-content {
     h3 {
       font-size: $font-size-large;
       color: $text-primary;
       margin-bottom: 15px;
     }
-    
+
     ul {
       padding-left: 20px;
-      
+
       li {
         margin-bottom: 10px;
         color: $text-regular;
@@ -546,15 +542,15 @@ export default {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .show-actions {
     flex-direction: column;
   }
-  
+
   .session-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
 }
-</style> 
+</style>
