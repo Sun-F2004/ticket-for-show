@@ -5,12 +5,11 @@
     <!-- 轮播图 -->
     <div class="banner-section">
       <el-carousel height="400px" indicator-position="outside">
-        <el-carousel-item v-for="banner in banners" :key="banner.id">
-          <div class="banner-item" :style="{ backgroundImage: `url(${banner.image})` }">
+        <el-carousel-item v-for="show in hotShows" :key="show.id">
+          <div class="banner-item" :style="{ backgroundImage: `url(${show.mainImageUrl})` }">
             <div class="banner-content">
-              <h2>{{ banner.title }}</h2>
-              <p>{{ banner.description }}</p>
-              <el-button type="primary" size="large" @click="goToShow(banner.showId)">
+              <h2>{{ show.name }}</h2>
+              <el-button type="primary" size="large" @click="goToShow(show.showId)">
                 立即购票
               </el-button>
             </div>

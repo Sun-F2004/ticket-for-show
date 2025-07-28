@@ -5,39 +5,35 @@
     <div class="detail-container">
       <div class="container">
         <div v-loading="loading" class="detail-content">
-          <!-- 面包屑导航 -->
+          <!-- 面包屑导航
           <el-breadcrumb separator="/" class="breadcrumb">
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item :to="{ path: `/category/${showDetail.category}` }">
               {{ getCategoryName(showDetail.category) }}
             </el-breadcrumb-item>
             <el-breadcrumb-item>{{ showDetail.title }}</el-breadcrumb-item>
-          </el-breadcrumb>
+          </el-breadcrumb> -->
 
           <!-- 演出基本信息 -->
           <div class="show-info-section">
             <div class="show-image">
-              <img :src="showDetail.image" :alt="showDetail.title"/>
-              <div class="show-tags">
+              <img :src="showDetail.mainImageUrl" :alt="showDetail.name"/>
+              <!-- <div class="show-tags">
                 <span v-if="showDetail.isHot" class="tag tag-hot">热门</span>
                 <span v-if="showDetail.isNew" class="tag tag-new">新品</span>
-              </div>
+              </div> -->
             </div>
 
             <div class="show-info">
-              <h1 class="show-title">{{ showDetail.title }}</h1>
+              <h1 class="show-title">{{ showDetail.name }}</h1>
               <div class="show-meta">
                 <div class="meta-item">
                   <i class="el-icon-location"></i>
-                  <span>场馆：{{ showDetail.venue }}</span>
+                  <span>场馆：{{ showDetail.position }}</span>
                 </div>
                 <div class="meta-item">
                   <i class="el-icon-time"></i>
-                  <span>时间：{{ showDetail.time }}</span>
-                </div>
-                <div class="meta-item">
-                  <i class="el-icon-user"></i>
-                  <span>艺人：{{ showDetail.artist }}</span>
+                  <span>时间：{{ showDetail.startTime }}</span>
                 </div>
                 <div class="meta-item">
                   <i class="el-icon-tickets"></i>
@@ -45,10 +41,10 @@
                 </div>
               </div>
 
-              <div class="show-description">
+              <!-- <div class="show-description">
                 <h3>演出介绍</h3>
-                <p>{{ showDetail.description }}</p>
-              </div>
+                <img :src="showDetail.mainImageUrl" :alt="showDetail.mainImageUrl" />
+              </div> -->
 
               <div class="show-actions">
                 <el-button type="primary" size="large" @click="goToBooking">
@@ -79,8 +75,8 @@
                   @click="selectSession(session)"
               >
                 <div class="session-info">
-                  <div class="session-time">{{ session.time }}</div>
-                  <div class="session-venue">{{ session.venue }}</div>
+                  <div class="session-time">{{ session.startTime }}</div>
+                  <div class="session-venue">{{ session.venueName }}</div>
                 </div>
                 <div class="session-price">
                   <span class="price">¥{{ session.minPrice }}</span>
@@ -115,7 +111,9 @@
           <div class="detail-tabs">
             <el-tabs v-model="activeTab">
               <el-tab-pane label="演出详情" name="detail">
-                <div class="detail-content" v-html="showDetail.detailContent"></div>
+                <div class="detail-content">
+                  <img :src="showDetail.mainImageUrl" :alt="showDetail.name" />
+                </div>
               </el-tab-pane>
               <el-tab-pane label="购票须知" name="notice">
                 <div class="notice-content">
@@ -150,6 +148,7 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex'
+import { getEventInfo, getSession } from '@/api/event'
 import Header from '@/components/Header.vue'
 
 export default {
@@ -180,8 +179,8 @@ export default {
 
     async loadShowDetail(showId) {
       try {
-        const response = await this.getShowDetail(showId)
-        this.showDetail = response.data || this.getMockShowDetail()
+        const response = await getEventInfo(this.$route.params.id)
+        this.showDetail = response.content
       } catch (error) {
         console.error('加载演出详情失败:', error)
         this.showDetail = this.getMockShowDetail()
@@ -190,8 +189,8 @@ export default {
 
     async loadSessions(showId) {
       try {
-        const response = await this.getShowSessions(showId)
-        this.sessions = response.data || this.getMockSessions()
+        const response = await getSession(this.$route.params.id)
+        this.sessions = response.content
         if (this.sessions.length > 0) {
           this.selectedSession = this.sessions[0]
         }

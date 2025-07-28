@@ -42,3 +42,12 @@ export function getTicket(eventId) {
     })
 }
 
+export function getEventInfo(id) {
+    return request({
+        url: '/event/event/info',
+        method: 'post',
+        data: {
+            "id": id
+        }
+    })
+}
