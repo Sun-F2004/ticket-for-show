@@ -52,3 +52,39 @@ export function forgotPassword(data) {
         data
     })
 }
+
+// 观演人管理
+// 获取观演人列表
+export function getPassengers() {
+    return request({
+        url: '/user/user/getAll',
+        method: 'get'
+    })
+}
+
+// 添加观演人
+export function addPassenger(data) {
+    return request({
+        url: '/user/user/add',
+        method: 'post',
+        data: data
+    })
+}
+
+// 编辑观演人
+export function updatePassenger(data) {
+    return request({
+        url: '/user/passenger/update',
+        method: 'put',
+        data: data
+    })
+}
+
+// 删除观演人
+export function deletePassenger(data) {
+    return request({
+        url: `/user/user/delete`,
+        method: 'delete',
+        data: data
+    })
+}

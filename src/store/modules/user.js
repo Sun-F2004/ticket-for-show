@@ -1,10 +1,11 @@
-import {getUserInfo, login, register, updateUserInfo} from '@/api/user'
+import {getUserInfo, login, register, updateUserInfo, getPassengers, addPassenger, updatePassenger, deletePassenger} from '@/api/user'
 import system from "@/utils/system";
 
 const state = {
     token: system.token,
     userInfo: {},
-    isLogin: false
+    isLogin: false,
+    passengers: [] // 观演人列表
 }
 
 const mutations = {
@@ -16,6 +17,10 @@ const mutations = {
         system.token = ''
         state.userInfo = {}
         state.isLogin = false
+        state.passengers = []
+    },
+    SET_PASSENGERS(state, passengers) {
+        state.passengers = passengers
     }
 }
 
@@ -76,13 +81,52 @@ const actions = {
     // 退出登录
     logout({commit}) {
         commit('CLEAR_USER')
-    }
+    },
+
+    // 获取观演人列表
+    async getPassengers({commit}) {
+        try {
+            const res = await getPassengers()
+            commit('SET_PASSENGERS', res.data || [])
+            return res
+        } catch (error) {
+            throw error
+        }
+    },
+    // 添加观演人
+    async addPassenger({dispatch}, passenger) {
+        try {
+            await addPassenger(passenger)
+            await dispatch('getPassengers')
+        } catch (error) {
+            throw error
+        }
+    },
+    // 编辑观演人
+    async updatePassenger({dispatch}, passenger) {
+        try {
+            await updatePassenger(passenger)
+            await dispatch('getPassengers')
+        } catch (error) {
+            throw error
+        }
+    },
+    // 删除观演人
+    async deletePassenger({dispatch}, id) {
+        try {
+            await deletePassenger(id)
+            await dispatch('getPassengers')
+        } catch (error) {
+            throw error
+        }
+    },
 }
 
 const getters = {
     isLogin: state => state.isLogin,
     userInfo: state => state.userInfo,
-    token: state => state.token
+    token: state => state.token,
+    passengers: state => state.passengers
 }
 
 export default {

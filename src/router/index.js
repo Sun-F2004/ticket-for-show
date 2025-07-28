@@ -9,6 +9,7 @@ import UserCenter from '../views/UserCenter.vue'
 import Cart from '../views/Cart.vue'
 import Category from '../views/Category.vue'
 import system from "@/utils/system";
+import {Message} from "element-ui";
 
 Vue.use(VueRouter)
 
@@ -31,7 +32,8 @@ const routes = [
     {
         path: '/show/:id',
         name: 'ShowDetail',
-        component: ShowDetail
+        component: ShowDetail,
+        meta: {requiresAuth: true}
     },
     {
         path: '/order',
@@ -69,6 +71,7 @@ router.beforeEach((to, from, next) => {
     const token = system.token
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!token) {
+            Message.warning('请先登录！')
             next('/login')
         } else {
             next()

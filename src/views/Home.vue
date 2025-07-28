@@ -289,7 +289,7 @@ export default {
     },
 
     goToShow(showId) {
-      this.$router.push(`/show/${showId}`)
+      this.$router.push(`/show/${showId}`).catch(err => {})
     },
 
     goToCategory(category) {

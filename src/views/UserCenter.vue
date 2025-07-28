@@ -40,6 +40,10 @@
                 <i class="el-icon-lock"></i>
                 <span>账户安全</span>
               </el-menu-item>
+              <el-menu-item index="passenger">
+                <i class="el-icon-s-custom"></i>
+                <span>观演人管理</span>
+              </el-menu-item>
             </el-menu>
           </div>
 
@@ -214,6 +218,49 @@
                 </div>
               </div>
             </div>
+
+            <!-- 观演人管理 -->
+            <div v-if="activeMenu === 'passenger'" class="passenger-section">
+              <h2>观演人管理</h2>
+              <el-button type="primary" @click="showAddPassenger = true" style="margin-bottom: 20px;">添加观演人</el-button>
+              <el-table :data="passengers" style="width: 100%">
+                <el-table-column prop="name" label="姓名" width="120"/>
+                <el-table-column prop="idType" label="证件类型" width="120"/>
+                <el-table-column prop="idNumber" label="证件号码" width="180"/>
+                <el-table-column prop="phone" label="手机号" width="140"/>
+                <el-table-column label="操作" width="180">
+                  <template slot-scope="scope">
+                    <el-button size="mini" @click="editPassenger(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="deletePassengerConfirm(scope.row.id)">删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <!-- 添加/编辑观演人弹窗 -->
+              <el-dialog :title="editPassengerData ? '编辑观演人' : '添加观演人'" :visible.sync="showAddPassenger">
+                <el-form :model="passengerForm" :rules="passengerRules" ref="passengerForm" label-width="100px">
+                  <el-form-item label="姓名" prop="name">
+                    <el-input v-model="passengerForm.name"/>
+                  </el-form-item>
+                  <el-form-item label="证件类型" prop="idType">
+                    <el-select v-model="passengerForm.idType" placeholder="请选择证件类型">
+                      <el-option label="身份证" value="身份证"/>
+                      <el-option label="护照" value="护照"/>
+                      <el-option label="港澳通行证" value="港澳通行证"/>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="证件号码" prop="idNumber">
+                    <el-input v-model="passengerForm.idNumber"/>
+                  </el-form-item>
+                  <el-form-item label="手机号" prop="phone">
+                    <el-input v-model="passengerForm.phone"/>
+                  </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                  <el-button @click="showAddPassenger = false">取 消</el-button>
+                  <el-button type="primary" @click="submitPassenger">确 定</el-button>
+                </div>
+              </el-dialog>
+            </div>
           </div>
         </div>
       </div>
@@ -256,11 +303,28 @@ export default {
       },
       orderList: [],
       favorites: [],
-      addresses: []
+      addresses: [],
+      showAddPassenger: false,
+      passengerForm: {
+        name: '',
+        idType: '',
+        idNumber: '',
+        phone: ''
+      },
+      passengerRules: {
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        idType: [{ required: true, message: '请选择证件类型', trigger: 'change' }],
+        idNumber: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
+        phone: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+        ]
+      },
+      editPassengerData: null
     }
   },
   computed: {
-    ...mapGetters('user', ['userInfo'])
+    ...mapGetters('user', ['userInfo', 'passengers'])
   },
   watch: {
     $route(to) {
@@ -276,9 +340,10 @@ export default {
       this.activeMenu = tab
     }
     this.loadUserData()
+    this.loadPassengers()
   },
   methods: {
-    ...mapActions('user', ['updateUserInfo']),
+    ...mapActions('user', ['updateUserInfo', 'getPassengers', 'addPassenger', 'updatePassenger', 'deletePassenger']),
     ...mapActions('order', ['getOrderList']),
 
     handleMenuSelect(key) {
@@ -443,6 +508,40 @@ export default {
 
     bindEmail() {
       this.$message.info('绑定邮箱功能开发中')
+    },
+    loadPassengers() {
+      this.getPassengers()
+    },
+    editPassenger(row) {
+      this.editPassengerData = row
+      this.passengerForm = { ...row }
+      this.showAddPassenger = true
+    },
+    deletePassengerConfirm(id) {
+      this.$confirm('确定要删除该观演人吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deletePassenger(id).then(() => {
+          this.$message.success('删除成功')
+        })
+      })
+    },
+    submitPassenger() {
+      this.$refs.passengerForm.validate(async valid => {
+        if (!valid) return
+        if (this.editPassengerData) {
+          await this.updatePassenger(this.passengerForm)
+          this.$message.success('编辑成功')
+        } else {
+          await this.addPassenger(this.passengerForm)
+          this.$message.success('添加成功')
+        }
+        this.showAddPassenger = false
+        this.editPassengerData = null
+        this.passengerForm = { name: '', idType: '', idNumber: '', phone: '' }
+      })
     }
   }
 }
@@ -729,6 +828,18 @@ export default {
         }
       }
     }
+  }
+}
+
+.passenger-section {
+  .el-table {
+    border: 1px solid $border-color-light;
+    border-radius: $border-radius-base;
+    overflow: hidden;
+  }
+
+  .el-button {
+    margin-right: 10px;
   }
 }
 

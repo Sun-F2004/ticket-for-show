@@ -13,7 +13,7 @@
           <div class="order-items">
             <h2>订单商品</h2>
             <div class="items-list">
-              <div v-for="item in orderItems" :key="item.id" class="order-item">
+              <div v-for="(item, idx) in orderItems" :key="item.id" class="order-item">
                 <div class="item-image">
                   <img :src="item.image" :alt="item.title"/>
                 </div>
@@ -36,25 +36,21 @@
             </div>
           </div>
 
-          <!-- 联系人信息 -->
-          <div class="contact-info">
-            <h2>联系人信息</h2>
-            <el-form
-                ref="contactForm"
-                :model="contactForm"
-                :rules="contactRules"
-                label-width="100px"
-            >
-              <el-form-item label="联系人" prop="name">
-                <el-input v-model="contactForm.name" placeholder="请输入联系人姓名"/>
-              </el-form-item>
-              <el-form-item label="手机号" prop="phone">
-                <el-input v-model="contactForm.phone" placeholder="请输入手机号"/>
-              </el-form-item>
-              <el-form-item label="邮箱" prop="email">
-                <el-input v-model="contactForm.email" placeholder="请输入邮箱"/>
-              </el-form-item>
-            </el-form>
+          <!-- 观演人选择 -->
+          <div class="passenger-select-section">
+            <h2>选择观演人</h2>
+            <div v-for="(pid, idx) in passengerSelectList" :key="pid.id" class="passenger-select-row">
+              <el-select v-model="pid.value" placeholder="请选择观演人" style="width: 220px;">
+                <el-option
+                  v-for="p in passengers"
+                  :key="p.id"
+                  :label="p.name + '（' + p.idType + ' ' + p.idNumber + '）'"
+                  :value="p"
+                />
+              </el-select>
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="removePassengerSelect(idx)" v-if="passengerSelectList.length > 1 && idx > 0" style="margin-left: 10px;">删除</el-button>
+            </div>
+            <el-button type="primary" icon="el-icon-plus" size="mini" @click="addPassengerSelect" style="margin-top: 10px;">添加观演人</el-button>
           </div>
 
           <!-- 支付方式 -->
@@ -154,12 +150,15 @@ export default {
       },
       paymentMethod: 'alipay',
       orderRemark: '',
-      submitting: false
+      submitting: false,
+      passengerSelectList: [
+        { id: Date.now(), value: null }
+      ],
     }
   },
   computed: {
     ...mapGetters('order', ['loading']),
-    ...mapGetters('user', ['userInfo']),
+    ...mapGetters('user', ['userInfo', 'passengers']),
 
     totalAmount() {
       return this.orderItems.reduce((total, item) => {
@@ -177,6 +176,7 @@ export default {
   },
   async mounted() {
     await this.loadOrderData()
+    this.$store.dispatch('user/getPassengers')
   },
   methods: {
     ...mapActions('order', ['createOrder']),
@@ -246,16 +246,36 @@ export default {
       }
     },
 
+    addPassengerSelect() {
+      this.passengerSelectList.push({ id: Date.now() + Math.random(), value: null })
+    },
+    removePassengerSelect(idx) {
+      this.passengerSelectList.splice(idx, 1)
+    },
+
     async submitOrder() {
       try {
         const valid = await this.$refs.contactForm.validate()
         if (!valid) return
 
+        // 校验观演人选择
+        if (this.passengerSelectList.length === 0) {
+          this.$message.error('请至少添加一位观演人')
+          return
+        }
+        for (const item of this.passengerSelectList) {
+          if (!item.value) {
+            this.$message.error('请为每个观演人选择信息')
+            return
+          }
+        }
+
         this.submitting = true
 
         const orderData = {
           items: this.orderItems,
-          contact: this.contactForm,
+          passengers: this.passengerSelectList.map(i => i.value),
+          contact: this.contactForm, // 可选，兼容老数据
           paymentMethod: this.paymentMethod,
           remark: this.orderRemark,
           totalAmount: this.totalAmount,
