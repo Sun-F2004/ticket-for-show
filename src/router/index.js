@@ -7,6 +7,7 @@ import ShowDetail from '../views/ShowDetail.vue'
 import Order from '../views/Order.vue'
 import UserCenter from '../views/UserCenter.vue'
 import Cart from '../views/Cart.vue'
+import Category from '../views/Category.vue'
 import system from "@/utils/system";
 
 Vue.use(VueRouter)
@@ -49,6 +50,11 @@ const routes = [
         name: 'Cart',
         component: Cart,
         meta: {requiresAuth: true}
+    },
+    {
+        path: '/category/:id',
+        name: 'Category',
+        component: Category
     }
 ]
 
