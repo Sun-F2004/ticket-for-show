@@ -5,16 +5,16 @@ export function login(data) {
     return request({
         url: '/user/user/login',
         method: 'post',
-        data: data,
+        data: data
     })
 }
 
 // 用户注册
 export function register(data) {
     return request({
-        url: '/user/register',
+        url: '/user/user/register',
         method: 'post',
-        data
+        data: data
     })
 }
 
@@ -41,15 +41,6 @@ export function changePassword(data) {
         url: '/user/change-password',
         method: 'put',
         data
-    })
-}
-
-// 发送验证码
-export function sendVerificationCode(phone) {
-    return request({
-        url: '/user/send-code',
-        method: 'post',
-        data: {phone}
     })
 }
 

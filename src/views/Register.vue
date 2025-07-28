@@ -14,29 +14,63 @@
             class="register-form"
             @submit.native.prevent="handleRegister"
         >
-          <el-form-item prop="username">
+          <el-form-item prop="account">
             <el-input
-                v-model="registerForm.username"
-                placeholder="请输入用户名"
+                v-model="registerForm.account"
+                placeholder="请输入账户名"
                 prefix-icon="el-icon-user"
                 size="large"
             />
           </el-form-item>
 
-          <el-form-item prop="phone">
+          <el-form-item prop="realName">
             <el-input
-                v-model="registerForm.phone"
-                placeholder="请输入手机号"
-                prefix-icon="el-icon-mobile-phone"
+                v-model="registerForm.realName"
+                placeholder="请输入真名"
+                prefix-icon="el-icon-user"
                 size="large"
             />
           </el-form-item>
 
-          <el-form-item prop="email">
+          <el-form-item prop="nickname">
             <el-input
-                v-model="registerForm.email"
-                placeholder="请输入邮箱"
-                prefix-icon="el-icon-message"
+                v-model="registerForm.nickname"
+                placeholder="请输入昵称"
+                prefix-icon="el-icon-edit-outline"
+                size="large"
+            />
+          </el-form-item>
+
+          <el-form-item prop="gender" label="性别">
+            <el-radio-group v-model="registerForm.gender">
+              <el-radio :label="0">女</el-radio>
+              <el-radio :label="1">男</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item prop="phoneNumber">
+            <el-input
+                v-model="registerForm.phoneNumber"
+                placeholder="请输入电话号码"
+                prefix-icon="el-icon-phone-outline"
+                size="large"
+            />
+          </el-form-item>
+
+          <el-form-item prop="birthday">
+            <el-date-picker
+                v-model="registerForm.birthday"
+                type="date"
+                placeholder="请选择生日"
+                style="width: 100%;">
+            </el-date-picker>
+          </el-form-item>
+
+          <el-form-item prop="idCardNumber">
+            <el-input
+                v-model="registerForm.idCardNumber"
+                placeholder="请输入身份证号码"
+                prefix-icon="el-icon-bank-card"
                 size="large"
             />
           </el-form-item>
@@ -63,28 +97,25 @@
             />
           </el-form-item>
 
-          <el-form-item prop="verificationCode">
-            <div class="verification-code">
-              <el-input
-                  v-model="registerForm.verificationCode"
-                  placeholder="请输入验证码"
-                  prefix-icon="el-icon-key"
-                  size="large"
-              />
-              <el-button
-                  type="primary"
-                  :disabled="countdown > 0"
-                  @click="sendVerificationCode"
-              >
-                {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
-              </el-button>
-            </div>
-          </el-form-item>
+<!--          <el-form-item prop="captcha">-->
+<!--            <div class="captcha">-->
+<!--              <el-input-->
+<!--                  v-model="registerForm.captcha"-->
+<!--                  placeholder="请输入验证码"-->
+<!--                  prefix-icon="el-icon-key"-->
+<!--                  size="large"-->
+<!--              />-->
+
+<!--              <el-image-->
+<!--                :src="captchaUrl"-->
+<!--                fit="cover"/>-->
+<!--            </div>-->
+<!--          </el-form-item>-->
 
           <el-form-item>
             <el-button
                 type="primary"
-                size="large"
+                size="medium"
                 class="register-btn"
                 :loading="loading"
                 @click="handleRegister"
@@ -105,14 +136,11 @@
 
 <script>
 import {mapActions} from 'vuex'
-import {sendVerificationCode} from '@/api/user'
-import Header from '@/components/Header.vue'
+import {getCaptcha} from "@/api/common";
 
 export default {
   name: 'Register',
-  components: {
-    Header
-  },
+
   data() {
     const validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.registerForm.password) {
@@ -124,56 +152,72 @@ export default {
 
     return {
       registerForm: {
-        username: '',
-        phone: '',
-        email: '',
+        account: '',
+        realName: '',
+        nickname: '',
+        gender: '',
+        phoneNumber: '',
+        birthday: '',
+        idCardNumber: '',
         password: '',
         confirmPassword: '',
-        verificationCode: ''
+        captcha: ''
       },
       registerRules: {
-        username: [
-          {required: true, message: '请输入用户名', trigger: 'blur'},
-          {min: 3, max: 20, message: '用户名长度在3到20个字符', trigger: 'blur'}
+        account: [
+          {required: true, message: '请输入用户名', trigger: 'blur'}
         ],
-        phone: [
-          {required: true, message: '请输入手机号', trigger: 'blur'},
-          {pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur'}
+        realName: [
+          {required: true, message: '请输入真名', trigger: 'blur'}
         ],
-        email: [
-          {required: true, message: '请输入邮箱', trigger: 'blur'},
-          {type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur'}
+        nickname: [
+          {required: true, message: '请输入昵称', trigger: 'blur'}
+        ],
+        gender: [
+          { required: true, message: '请选择性别', trigger: 'change' }
+        ],
+        phoneNumber: [
+          {required: true, message: '请输入电话号码', trigger: 'blur'}
+        ],
+        birthday: [
+          {required: true, message: '请选择生日', trigger: 'change'}
+        ],
+        idCardNumber: [
+          {required: true, message: '请输入身份证号码', trigger: 'blur'}
         ],
         password: [
-          {required: true, message: '请输入密码', trigger: 'blur'},
-          {min: 6, message: '密码长度不能少于6位', trigger: 'blur'}
+          {required: true, message: '请输入密码', trigger: 'blur'}
         ],
         confirmPassword: [
           {required: true, message: '请确认密码', trigger: 'blur'},
           {validator: validateConfirmPassword, trigger: 'blur'}
         ],
-        verificationCode: [
-          {required: true, message: '请输入验证码', trigger: 'blur'},
-          {len: 6, message: '验证码长度为6位', trigger: 'blur'}
-        ]
+        // captcha: [
+        //   {required: true, message: '请输入验证码', trigger: 'blur'}
+        // ]
       },
-      agreeTerms: false,
       loading: false,
-      countdown: 0
+      // captchaUrl: '',
+      // captchaKey: '' // 验证码对应的key标识
     }
   },
+
+  // async mounted() {
+  //   const {captchaUrl, captchaKey} = await getCaptcha()
+  //   this.captchaUrl = captchaUrl
+  //   this.captchaKey = captchaKey
+  // },
+
   methods: {
     ...mapActions('user', ['register']),
 
     async handleRegister() {
       try {
-        const valid = await this.$refs.registerForm.validate()
+        let valid = false
+        this.$refs.registerForm.validate(isValid => {
+          valid = isValid
+        })
         if (!valid) return
-
-        if (!this.agreeTerms) {
-          this.$message.warning('请先同意用户协议和隐私政策')
-          return
-        }
 
         this.loading = true
         await this.register(this.registerForm)
@@ -186,39 +230,6 @@ export default {
         this.loading = false
       }
     },
-
-    async sendVerificationCode() {
-      if (!this.registerForm.phone) {
-        this.$message.warning('请先输入手机号')
-        return
-      }
-
-      try {
-        await sendVerificationCode(this.registerForm.phone)
-        this.$message.success('验证码已发送')
-        this.startCountdown()
-      } catch (error) {
-        this.$message.error(error.message || '发送验证码失败')
-      }
-    },
-
-    startCountdown() {
-      this.countdown = 60
-      const timer = setInterval(() => {
-        this.countdown--
-        if (this.countdown <= 0) {
-          clearInterval(timer)
-        }
-      }, 1000)
-    },
-
-    showTerms() {
-      this.$message.info('用户协议功能开发中')
-    },
-
-    showPrivacy() {
-      this.$message.info('隐私政策功能开发中')
-    }
   }
 }
 </script>
@@ -263,7 +274,7 @@ export default {
 }
 
 .register-form {
-  .verification-code {
+  .captcha {
     display: flex;
     gap: 10px;
 
@@ -271,9 +282,8 @@ export default {
       flex: 1;
     }
 
-    .el-button {
+    .el-image {
       width: 120px;
-      white-space: nowrap;
     }
   }
 
@@ -312,21 +322,6 @@ export default {
 
     &:hover {
       text-decoration: underline;
-    }
-  }
-}
-
-// 响应式设计
-@media (max-width: 480px) {
-  .register-box {
-    padding: 30px 20px;
-  }
-
-  .verification-code {
-    flex-direction: column;
-
-    .el-button {
-      width: 100% !important;
     }
   }
 }

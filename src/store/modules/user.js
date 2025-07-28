@@ -1,7 +1,8 @@
 import {getUserInfo, login, register, updateUserInfo} from '@/api/user'
+import system from "@/utils/system";
 
 const state = {
-    token: localStorage.getItem('token') || '',
+    token: system.token,
     userInfo: {},
     isLogin: false
 }
@@ -12,10 +13,9 @@ const mutations = {
         state.isLogin = true
     },
     CLEAR_USER(state) {
-        state.token = ''
+        system.token = ''
         state.userInfo = {}
         state.isLogin = false
-        localStorage.removeItem('token')
     }
 }
 
@@ -23,7 +23,7 @@ const actions = {
     // 用户登录
     async login({commit}, loginForm) {
         try {
-            const response = await login(loginForm)
+            await login(loginForm)
             const cookies = document.cookie.split(';')
 
             // 获取cookie中的令牌
@@ -36,7 +36,7 @@ const actions = {
                 }
             }
             system.token = token
-            return response
+            commit('SET_USER_INFO', loginForm)
         } catch (error) {
             throw error
         }
@@ -45,8 +45,7 @@ const actions = {
     // 用户注册
     async register({commit}, registerForm) {
         try {
-            const response = await register(registerForm)
-            return response
+            await register(registerForm)
         } catch (error) {
             throw error
         }

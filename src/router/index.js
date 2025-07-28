@@ -7,6 +7,7 @@ import ShowDetail from '../views/ShowDetail.vue'
 import Order from '../views/Order.vue'
 import UserCenter from '../views/UserCenter.vue'
 import Cart from '../views/Cart.vue'
+import system from "@/utils/system";
 
 Vue.use(VueRouter)
 

@@ -1,7 +1,7 @@
 {
   "name": "ticket-for-show",
   "version": "1.0.0",
-  "description": "演出购票系统前端",
+  "description": "演出购票系统",
   "main": "index.js",
   "scripts": {
     "serve": "vue-cli-service serve",

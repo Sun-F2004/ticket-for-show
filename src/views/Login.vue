@@ -17,7 +17,7 @@
           <el-form-item prop="account">
             <el-input
                 v-model="loginForm.account"
-                placeholder="请输入用户名/手机号/邮箱"
+                placeholder="请输入账户名"
                 prefix-icon="el-icon-user"
                 size="large"
             />
@@ -62,13 +62,10 @@
 
 <script>
 import {mapActions} from 'vuex'
-import Header from '@/components/Header.vue'
 
 export default {
   name: 'Login',
-  components: {
-    Header
-  },
+
   data() {
     return {
       loginForm: {
@@ -86,6 +83,7 @@ export default {
       loading: false
     }
   },
+
   methods: {
     ...mapActions('user', ['login']),
 
@@ -101,7 +99,6 @@ export default {
         await this.login(this.loginForm)
 
         this.$message.success('登录成功')
-
         // 前往首页
         this.$router.push({name: 'Home'})
       } catch (error) {
