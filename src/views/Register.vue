@@ -97,20 +97,21 @@
             />
           </el-form-item>
 
-<!--          <el-form-item prop="captcha">-->
-<!--            <div class="captcha">-->
-<!--              <el-input-->
-<!--                  v-model="registerForm.captcha"-->
-<!--                  placeholder="请输入验证码"-->
-<!--                  prefix-icon="el-icon-key"-->
-<!--                  size="large"-->
-<!--              />-->
+         <el-form-item prop="captcha">
+           <div class="captcha">
+             <el-input
+                 v-model="registerForm.captcha"
+                 placeholder="请输入验证码"
+                 prefix-icon="el-icon-key"
+                 size="large"
+             />
 
-<!--              <el-image-->
-<!--                :src="captchaUrl"-->
-<!--                fit="cover"/>-->
-<!--            </div>-->
-<!--          </el-form-item>-->
+             <el-image
+               :src="captchaUrl"
+               fit="cover"
+               @click="getCaptcha"/>
+           </div>
+           </el-form-item>
 
           <el-form-item>
             <el-button
@@ -136,7 +137,7 @@
 
 <script>
 import {mapActions} from 'vuex'
-import {getCaptcha} from "@/api/common";
+import {getCaptcha, validate} from "@/api/common";
 
 export default {
   name: 'Register',
@@ -192,24 +193,28 @@ export default {
           {required: true, message: '请确认密码', trigger: 'blur'},
           {validator: validateConfirmPassword, trigger: 'blur'}
         ],
-        // captcha: [
-        //   {required: true, message: '请输入验证码', trigger: 'blur'}
-        // ]
+        captcha: [
+          {required: true, message: '请输入验证码', trigger: 'blur'}
+        ]
       },
       loading: false,
-      // captchaUrl: '',
+      captchaUrl: '',
       // captchaKey: '' // 验证码对应的key标识
     }
   },
 
-  // async mounted() {
-  //   const {captchaUrl, captchaKey} = await getCaptcha()
-  //   this.captchaUrl = captchaUrl
-  //   this.captchaKey = captchaKey
-  // },
+  async mounted() {
+    await this.getCaptcha()
+  },
 
   methods: {
     ...mapActions('user', ['register']),
+
+    async getCaptcha() {
+        const blob = await getCaptcha()
+        this.captchaUrl = window.URL.createObjectURL(blob)
+        console.log(this.captchaUrl)
+    },
 
     async handleRegister() {
       try {
@@ -218,10 +223,9 @@ export default {
           valid = isValid
         })
         if (!valid) return
-
         this.loading = true
+        await validate(this.registerForm.captcha)
         await this.register(this.registerForm)
-
         this.$message.success('注册成功，请登录')
         this.$router.push('/login')
       } catch (error) {
@@ -229,7 +233,7 @@ export default {
       } finally {
         this.loading = false
       }
-    },
+    }
   }
 }
 </script>

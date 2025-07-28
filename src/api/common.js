@@ -5,10 +5,22 @@ import {Message} from "element-ui";
 export function getCaptcha() {
     return request({
         url: '/common/kaptcha/get',
-        method: 'post'
-    }).catch(err => {
-        Message.error(err)
+        method: 'post',
+        responseType: 'blob'
     })
 }
+
+export function validate(captcha) {
+    return request({
+        url: '/common/kaptcha/validate',
+        method: 'post',
+        data: {
+            "captcha" : captcha
+        }
+    })
+}
+
+
+
 
 // fire 123

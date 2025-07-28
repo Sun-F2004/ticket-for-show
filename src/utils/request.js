@@ -25,9 +25,11 @@ service.interceptors.request.use(
 service.interceptors.response.use(
     response => {
         const res = response.data
-        if (res.code !== 1) {
+        if (response.config.responseType !== 'blob' && res.code !== 1) {
+            console.log("请求233")
             return Promise.reject(new Error(res.message || '请求失败'))
         } else {
+            console.log(response.config.responseType)
             return res
         }
     },

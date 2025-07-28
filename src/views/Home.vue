@@ -30,7 +30,7 @@
               @click="goToCategory(category.path)"
           >
             <i :class="category.icon"></i>
-            <span>{{ category.name }}</span>
+            <span>{{ category.categoryName }}</span>
           </div>
         </div>
       </div>
@@ -52,16 +52,16 @@
               @click="goToShow(show.id)"
           >
             <div class="show-image">
-              <img :src="show.image" :alt="show.title"/>
+              <img :src="show.mainImageUrl" :alt="show.name"/>
               <div class="show-tags">
                 <span v-if="show.isHot" class="tag tag-hot">热门</span>
                 <span v-if="show.isNew" class="tag tag-new">新品</span>
               </div>
             </div>
             <div class="show-info">
-              <h3 class="show-title">{{ show.title }}</h3>
-              <p class="show-venue">{{ show.venue }}</p>
-              <p class="show-time">{{ show.time }}</p>
+              <h3 class="show-title">{{ show.name }}</h3>
+              <p class="show-venue">{{ show.position }}</p>
+              <p class="show-time">{{ show.startTime }}</p>
               <div class="show-price">
                 <span class="price">¥{{ show.minPrice }}</span>
                 <span class="price-desc">起</span>
@@ -89,16 +89,16 @@
               @click="goToShow(show.id)"
           >
             <div class="show-image">
-              <img :src="show.image" :alt="show.title"/>
+              <img :src="show.mainImageUrl" :alt="show.name"/>
               <div class="show-tags">
                 <span v-if="show.isHot" class="tag tag-hot">热门</span>
                 <span v-if="show.isNew" class="tag tag-new">新品</span>
               </div>
             </div>
             <div class="show-info">
-              <h3 class="show-title">{{ show.title }}</h3>
-              <p class="show-venue">{{ show.venue }}</p>
-              <p class="show-time">{{ show.time }}</p>
+              <h3 class="show-title">{{ show.name }}</h3>
+              <p class="show-venue">{{ show.position }}</p>
+              <p class="show-time">{{ show.startTime }}</p>
               <div class="show-price">
                 <span class="price">¥{{ show.minPrice }}</span>
                 <span class="price-desc">起</span>
@@ -126,16 +126,16 @@
               @click="goToShow(show.id)"
           >
             <div class="show-image">
-              <img :src="show.image" :alt="show.title"/>
+              <img :src="show.mainImageUrl" :alt="show.name"/>
               <div class="show-tags">
                 <span v-if="show.isHot" class="tag tag-hot">热门</span>
                 <span v-if="show.isNew" class="tag tag-new">新品</span>
               </div>
             </div>
             <div class="show-info">
-              <h3 class="show-title">{{ show.title }}</h3>
-              <p class="show-venue">{{ show.venue }}</p>
-              <p class="show-time">{{ show.time }}</p>
+              <h3 class="show-title">{{ show.name }}</h3>
+              <p class="show-venue">{{ show.position }}</p>
+              <p class="show-time">{{ show.startTime }}</p>
               <div class="show-price">
                 <span class="price">¥{{ show.minPrice }}</span>
                 <span class="price-desc">起</span>
@@ -150,6 +150,7 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex'
+import {getCategory, getEvent} from '@/api/event'
 import Header from '@/components/Header.vue'
 
 export default {
@@ -182,16 +183,17 @@ export default {
           showId: 3
         }
       ],
-      categories: [
-        {id: 1, name: '演唱会', icon: 'el-icon-microphone', path: '/category/concert'},
-        {id: 2, name: '话剧', icon: 'el-icon-video-camera', path: '/category/drama'},
-        {id: 3, name: '音乐剧', icon: 'el-icon-headset', path: '/category/musical'},
-        {id: 4, name: '戏曲', icon: 'el-icon-trophy', path: '/category/opera'},
-        {id: 5, name: '儿童剧', icon: 'el-icon-star-on', path: '/category/children'},
-        {id: 6, name: '展览', icon: 'el-icon-picture', path: '/category/exhibition'},
-        {id: 7, name: '音乐会', icon: 'el-icon-service', path: '/category/classical'},
-        {id: 8, name: '舞蹈', icon: 'el-icon-user', path: '/category/dance'}
-      ],
+      // categories: [
+      //   {id: 1, name: '演唱会', icon: 'el-icon-microphone', path: '/category/concert'},
+      //   {id: 2, name: '话剧', icon: 'el-icon-video-camera', path: '/category/drama'},
+      //   {id: 3, name: '音乐剧', icon: 'el-icon-headset', path: '/category/musical'},
+      //   {id: 4, name: '戏曲', icon: 'el-icon-trophy', path: '/category/opera'},
+      //   {id: 5, name: '儿童剧', icon: 'el-icon-star-on', path: '/category/children'},
+      //   {id: 6, name: '展览', icon: 'el-icon-picture', path: '/category/exhibition'},
+      //   {id: 7, name: '音乐会', icon: 'el-icon-service', path: '/category/classical'},
+      //   {id: 8, name: '舞蹈', icon: 'el-icon-user', path: '/category/dance'}
+      // ],
+      categories: [],
       hotShows: [],
       recommendedShows: [],
       latestShows: []
@@ -202,23 +204,35 @@ export default {
   },
   async mounted() {
     await this.loadShows()
+    await this.loadCategories()
   },
   methods: {
     ...mapActions('show', ['getShowList']),
 
+    async loadCategories() {
+      const { content } = await getCategory()
+      this.categories = content
+      console.log(this.categories)
+    },
+
     async loadShows() {
       try {
         // 获取热门演出
-        const hotResponse = await this.getShowList({category: 'hot', limit: 8})
-        this.hotShows = hotResponse.data || this.getMockShows('hot')
+        const hotRes = await getEvent(1, 4, "广州市")
+        this.hotShows = hotRes.list
 
         // 获取推荐演出
-        const recommendedResponse = await this.getShowList({category: 'recommended', limit: 8})
-        this.recommendedShows = recommendedResponse.data || this.getMockShows('recommended')
+        const recommandRes  = await getEvent(1, 4, null, 3)
+        this.recommendedShows = recommandRes.list
 
         // 获取最新演出
-        const latestResponse = await this.getShowList({category: 'latest', limit: 8})
-        this.latestShows = latestResponse.data || this.getMockShows('latest')
+        const latestRes = await getEvent(1, 4, null, null, "2025-07-01", "2025-07-10")
+        this.latestShows = latestRes.list
+
+        console.log(this.hotShows)
+        console.log(this.recommendedShows)
+        console.log(this.latestShows)
+
       } catch (error) {
         console.error('加载演出数据失败:', error)
         // 使用模拟数据
