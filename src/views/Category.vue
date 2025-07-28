@@ -33,7 +33,7 @@
           </el-tag>
         </div>
         <!-- 子类（模拟） -->
-        <div class="filter-row">
+        <!-- <div class="filter-row">
           <span class="filter-label">子类：</span>
           <el-tag
             v-for="sub in subCategories"
@@ -45,7 +45,7 @@
           >
             {{ sub }}
           </el-tag>
-        </div>
+        </div> -->
         <!-- 时间 -->
         <div class="filter-row">
           <span class="filter-label">时间：</span>
@@ -130,7 +130,7 @@ export default {
       selectedCity: '全部',
       categories: [],
       selectedCategory: '',
-      subCategories: ['全部', '其他', '球类运动', '电竞'], // 可根据实际接口调整
+      // subCategories: ['全部', '其他', '球类运动', '电竞'], // 可根据实际接口调整
       selectedSubCategory: '全部',
       timeOptions: [
         { label: '全部', value: '' },
@@ -160,6 +160,7 @@ export default {
     '$route.params.id': {
       immediate: true,
       handler(newVal) {
+        console.log("rwarwarID:" + this.$route.params.id)
         this.selectedCategory = newVal
         this.currentPage = 1
         this.fetchCategories()
@@ -198,6 +199,7 @@ export default {
         const res = await getEvent(
           this.currentPage,
           this.pageSize,
+
           this.selectedCity === '全部' ? null : this.selectedCity,
           this.selectedCategory === '全部' ? null : this.selectedCategory,
           fromDate,

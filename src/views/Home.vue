@@ -26,7 +26,7 @@
               v-for="category in categories"
               :key="category.id"
               class="category-item"
-              @click="goToCategory(category)"
+              @click="goToCategory(category.id)"
           >
             <i :class="category.icon"></i>
             <span>{{ category.categoryName }}</span>
@@ -293,8 +293,9 @@ export default {
     },
 
     goToCategory(category) {
+      console.log("分类ID: " + category)
       // 跳转到分类页面，传递分类ID
-      this.$router.push({ name: 'Category', params: { id: category.id } })
+      this.$router.push(`/category/${category}`)
     }
   }
 }

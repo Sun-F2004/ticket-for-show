@@ -92,27 +92,27 @@
           </div>
 
           <!-- 座位选择 -->
-          <div v-if="selectedSession" class="seats-section">
+          <!-- <div v-if="selectedSession" class="seats-section">
             <h2>选择座位</h2>
             <div class="seats-container">
               <div class="stage">舞台</div>
-              <div class="seats-map">
+              <div class="seats-map"> -->
                 <!-- 这里可以集成座位选择组件 -->
-                <div class="seats-placeholder">
+                <!-- <div class="seats-placeholder">
                   <i class="el-icon-tickets"></i>
                   <p>座位选择功能开发中</p>
                   <p>请点击"立即购票"进入购票流程</p>
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- 演出详情 -->
           <div class="detail-tabs">
             <el-tabs v-model="activeTab">
               <el-tab-pane label="演出详情" name="detail">
                 <div class="detail-content">
-                  <img :src="showDetail.mainImageUrl" :alt="showDetail.name" />
+                  <img :src="showDetail.description" :alt="showDetail.name" />
                 </div>
               </el-tab-pane>
               <el-tab-pane label="购票须知" name="notice">

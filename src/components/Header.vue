@@ -68,7 +68,7 @@
         >
 
 
-          <el-menu-item v-for="cat in categories" :key="cat.id" :index="cat.path">
+          <el-menu-item v-for="cat in categories" :key="cat.id" :index="cat.path" @click="goToCategory(cat.id)">
               {{ cat.categoryName }}
           </el-menu-item>
           
@@ -100,12 +100,12 @@ export default {
       this.activeIndex = to.path
     }
   },
-  mounted() {
+  async mounted() {
     this.activeIndex = this.$route.path
     if (this.isLogin) {
-      this.getCart()
+
     }
-    this.getCat()
+    await this.getCat()
   },
   methods: {
     ...mapActions('user', ['logout']),
@@ -147,6 +147,11 @@ export default {
           }
           break
       }
+    },
+
+    goToCategory(category) {
+      console.log("分类ID: " + category)
+      this.$router.push({ name: 'Category', params: { id: category } })
     }
   }
 }
