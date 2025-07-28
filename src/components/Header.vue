@@ -66,13 +66,12 @@
             text-color="#333"
             active-text-color="#ff6b35"
         >
-          <el-menu-item index="/">首页</el-menu-item>
-          <el-menu-item index="/category/concert">演唱会</el-menu-item>
-          <el-menu-item index="/category/drama">话剧</el-menu-item>
-          <el-menu-item index="/category/musical">音乐剧</el-menu-item>
-          <el-menu-item index="/category/opera">戏曲</el-menu-item>
-          <el-menu-item index="/category/children">儿童剧</el-menu-item>
-          <el-menu-item index="/category/exhibition">展览</el-menu-item>
+
+
+          <el-menu-item v-for="cat in categories" :key="cat.id" :index="cat.path">
+              {{ cat.categoryName }}
+          </el-menu-item>
+          
         </el-menu>
       </div>
     </div>
@@ -81,13 +80,15 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex'
+import { getCategory } from '@/api/event'
 
 export default {
   name: 'Header',
   data() {
     return {
       searchKeyword: '',
-      activeIndex: '/'
+      activeIndex: '/',
+      categories: []
     }
   },
   computed: {
@@ -104,6 +105,7 @@ export default {
     if (this.isLogin) {
       this.getCart()
     }
+    this.getCat()
   },
   methods: {
     ...mapActions('user', ['logout']),
@@ -120,6 +122,11 @@ export default {
 
     handleSelect(key) {
       this.$router.push(key)
+    },
+
+    async getCat() {
+      const categoriesRes = await getCategory()
+      this.categories = categoriesRes.content
     },
 
     async handleCommand(command) {
