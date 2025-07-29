@@ -21,8 +21,8 @@ export function register(data) {
 // 获取用户信息
 export function getUserInfo() {
     return request({
-        url: '/user/info',
-        method: 'get'
+        url: '/user/user/info',
+        method: 'POST'
     })
 }
 

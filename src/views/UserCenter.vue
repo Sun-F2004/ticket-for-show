@@ -11,8 +11,8 @@
               <div class="avatar">
                 <i class="el-icon-user"></i>
               </div>
-              <h3>{{ userInfo.username || '用户' }}</h3>
-              <p>{{ userInfo.email || '未设置邮箱' }}</p>
+              <h3>{{ userInfo.account || '用户' }}</h3>
+              <p>{{ userInfo.phoneNumber }}</p>
             </div>
 
             <el-menu
@@ -58,17 +58,14 @@
                   :rules="profileRules"
                   label-width="100px"
               >
-                <el-form-item label="用户名" prop="username">
-                  <el-input v-model="profileForm.username"/>
+                <el-form-item label="用户名" prop="account">
+                  <el-input v-model="profileForm.account"/>
                 </el-form-item>
                 <el-form-item label="真实姓名" prop="realName">
                   <el-input v-model="profileForm.realName"/>
                 </el-form-item>
-                <el-form-item label="手机号" prop="phone">
-                  <el-input v-model="profileForm.phone"/>
-                </el-form-item>
-                <el-form-item label="邮箱" prop="email">
-                  <el-input v-model="profileForm.email"/>
+                <el-form-item label="手机号" prop="phoneNumber">
+                  <el-input v-model="profileForm.phoneNumber"/>
                 </el-form-item>
                 <el-form-item label="性别" prop="gender">
                   <el-radio-group v-model="profileForm.gender">
@@ -271,7 +268,7 @@
 <script>
 import {mapGetters, mapActions} from 'vuex'
 import Header from '@/components/Header.vue'
-import { getPassengers } from '@/api/user'
+import { getPassengers, addPassenger, getUserInfo } from '@/api/user'
 
 export default {
   name: 'UserCenter',
@@ -284,12 +281,13 @@ export default {
       orderTab: 'all',
       orderLoading: false,
       profileForm: {
-        username: '',
+        account: '',
+        nickName: '',
         realName: '',
-        phone: '',
-        email: '',
+        phoneNumber: '',
         gender: '',
-        birthday: ''
+        birthday: '',
+        idCardNumber: ''
       },
       profileRules: {
         username: [
@@ -347,8 +345,11 @@ export default {
     },
 
     async loadUserData() {
+      const res = await getUserInfo()
+      console.log("用户信息")
       // 加载用户数据
-      this.profileForm = {...this.userInfo}
+      this.profileForm = res.content
+      console.log(this.profileForm)
 
       // 加载订单数据
       await this.loadOrders()
@@ -531,14 +532,15 @@ export default {
           await this.updatePassenger(this.passengerForm)
           this.$message.success('编辑成功')
         } else {
-          await this.addPassenger(this.passengerForm)
+          await addPassenger(this.passengerForm)
           this.$message.success('添加成功')
+          this.loadPassengers()
         }
         this.showAddPassenger = false
         this.editPassengerData = null
         this.passengerForm = { name: '', idCardNumber: ''}
       })
-    }
+    },
   }
 }
 </script>

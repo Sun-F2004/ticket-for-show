@@ -270,8 +270,10 @@ export default {
       this.$router.push({
         path: '/order',
         query: {
-          showId: this.showDetail.id,
-          sessionId: this.selectedSession.id
+          // showId: this.showDetail.id,
+          // sessionId: this.selectedSession.id
+            showDetail: this.showDetail,
+            sessionId: this.selectedSession.id
         }
       })
     },

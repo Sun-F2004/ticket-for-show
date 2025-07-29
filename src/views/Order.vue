@@ -13,45 +13,88 @@
           <div class="order-items">
             <h2>订单商品</h2>
             <div class="items-list">
-              <div v-for="(item, idx) in orderItems" :key="item.id" class="order-item">
+              <div v-for="item in showDetails" :key="item.id" class="order-item">
                 <div class="item-image">
-                  <img :src="item.image" :alt="item.title"/>
+                  <img :src="item.mainImageUrl" :alt="item.name"/>
                 </div>
                 <div class="item-info">
-                  <h3 class="item-title">{{ item.title }}</h3>
-                  <p class="item-venue">{{ item.venue }}</p>
-                  <p class="item-time">{{ item.time }}</p>
-                  <p class="item-session">场次：{{ item.session }}</p>
+                  <h3 class="item-title">{{ item.name }}</h3>
+                  <p class="item-venue">{{ item.position }}</p>
+                  <p class="item-time">{{ item.startTime }}</p>
+                  <p class="item-session">场次：{{ session.sessionName }}</p>
                 </div>
-                <div class="item-price">
+                <!-- <div class="item-price">
                   <span class="price">¥{{ item.price }}</span>
-                </div>
+                </div> -->
                 <div class="item-quantity">
-                  <span>x{{ item.quantity }}</span>
+                  <span>{{ selectAudience.length }}</span>
                 </div>
                 <div class="item-total">
-                  <span class="total-price">¥{{ item.price * item.quantity }}</span>
+                  <span class="total-price">¥{{ selectAudience.length * selectTicket.price }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 票 -->
+          <div class="ticket-section">
+            <h2>选择票</h2>
+            <div class="ticket-list">
+              <div
+                  v-for="ticket in tickets"
+                  :key="ticket.id"
+                  class="ticket-item"
+                  :class="{ active: selectedTicket?.id === ticket.id }"
+                  @click="selectTicket(ticket)"
+              >
+                <div class="ticket-info">
+                  <div class="ticket-name">{{ ticket.tierName }}</div>
+                </div>
+                <div class="ticket-price">
+                  <span class="price">¥{{ ticket.price }}</span>
+                  <span class="price-desc">起</span>
+                </div>
+                <div class="ticket-status">
+                  <el-tag type="success">售票中</el-tag>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 观演人选择 -->
-          <div class="passenger-select-section">
+          <div class="audience-section">
+            <h2>选择票</h2>
+            <div class="audience-list">
+              <div
+                  v-for="audience in passengers"
+                  :key="audience.id"
+                  class="audience-item"
+                  :class="{ active: selectedAudience.includes(audience.id) }"
+                  @click="selectAudience(audience.id)"
+              >
+                <div class="audience-info">
+                  <div class="audience-name">{{ audience.name }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 观演人选择 -->
+          <!-- <div class="passenger-select-section">
             <h2>选择观演人</h2>
             <div v-for="(pid, idx) in passengerSelectList" :key="pid.id" class="passenger-select-row">
               <el-select v-model="pid.value" placeholder="请选择观演人" style="width: 220px;">
                 <el-option
                   v-for="p in passengers"
                   :key="p.id"
-                  :label="p.name + '（' + p.idType + ' ' + p.idNumber + '）'"
+                  :label="p.name"
                   :value="p"
                 />
               </el-select>
               <el-button type="danger" icon="el-icon-delete" size="mini" @click="removePassengerSelect(idx)" v-if="passengerSelectList.length > 1 && idx > 0" style="margin-left: 10px;">删除</el-button>
             </div>
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="addPassengerSelect" style="margin-top: 10px;">添加观演人</el-button>
-          </div>
+          </div> -->
 
           <!-- 支付方式 -->
           <div class="payment-method">
@@ -121,6 +164,8 @@
 <script>
 import {mapActions, mapGetters} from 'vuex'
 import Header from '@/components/Header.vue'
+import { getPassengers } from '@/api/user'
+import { confirm, pay } from '@/api/order'
 
 export default {
   name: 'Order',
@@ -129,6 +174,13 @@ export default {
   },
   data() {
     return {
+      showDetails: [],
+      passengers: [],
+      tickets: [],
+      selectedTicket: {},
+      selectedAudience: [],
+      sessionId: '',
+      session: {},
       orderItems: [],
       contactForm: {
         name: '',
@@ -176,32 +228,57 @@ export default {
   },
   async mounted() {
     await this.loadOrderData()
+    await this.getPassengers()
     this.$store.dispatch('user/getPassengers')
   },
   methods: {
     ...mapActions('order', ['createOrder']),
 
-    async loadOrderData() {
-      const {showId, sessionId, from, items} = this.$route.query
+    async getPassengers() {
+      const { content } = await getPassengers()
+      this.passengers = content
+    },
 
-      if (from === 'cart' && items) {
-        // 从购物车来的订单
-        this.orderItems = this.getCartItems(items.split(','))
-      } else if (showId && sessionId) {
-        // 直接购买的订单
-        this.orderItems = [this.getDirectOrderItem(showId, sessionId)]
-      } else {
-        this.$message.error('订单信息不完整')
-        this.$router.push('/')
-        return
+    async loadOrderData() {
+      const { showDetail, sessionId } = this.$route.query
+      console.log("传过来的sessionID:" + sessionId)
+      this.showDetails.push(showDetail)
+      this.sessionId = sessionId
+      for (const session of showDetail.sessions) {
+        if (session.id == sessionId) {
+          this.session = session
+        }
       }
+      console.log(showDetail)
+      for (const ticket of showDetail.tickets) {
+        console.log("循环")
+        console.log(ticket)
+        console.log(ticket.sessionId)
+        if (ticket.sessionId == this.sessionId) {
+          console.log("找到了:" + ticket)
+          this.tickets.push(ticket)
+        }
+      }
+
+
+      // if (from === 'cart' && items) {
+      //   // 从购物车来的订单
+      //   this.orderItems = this.getCartItems(items.split(','))
+      // } else if (showId && sessionId) {
+      //   // 直接购买的订单
+      //   this.orderItems = [this.getDirectOrderItem(showId, sessionId)]
+      // } else {
+      //   this.$message.error('订单信息不完整')
+      //   this.$router.push('/')
+      //   return
+      // }
 
       // 预填联系人信息
-      if (this.userInfo) {
-        this.contactForm.name = this.userInfo.name || ''
-        this.contactForm.phone = this.userInfo.phone || ''
-        this.contactForm.email = this.userInfo.email || ''
-      }
+      // if (this.userInfo) {
+      //   this.contactForm.name = this.userInfo.name || ''
+      //   this.contactForm.phone = this.userInfo.phone || ''
+      //   this.contactForm.email = this.userInfo.email || ''
+      // }
     },
 
     getCartItems(itemIds) {
@@ -252,46 +329,52 @@ export default {
     removePassengerSelect(idx) {
       this.passengerSelectList.splice(idx, 1)
     },
+    selectTicket(ticket) {
+      this.selectedTicket = ticket
+    },
+    selectAudience(id) {
+      let index = this.selectedAudience.indexOf(id)
+      if (index !== -1) {
+        this.selectedAudience.splice(index, 1)
+      } else {
+        this.selectedAudience.push(id)
+      }
+    },
 
     async submitOrder() {
       try {
-        const valid = await this.$refs.contactForm.validate()
-        if (!valid) return
+        // const valid = await this.$refs.contactForm.validate()
+        // if (!valid) return
 
         // 校验观演人选择
-        if (this.passengerSelectList.length === 0) {
+        if (this.selectedAudience.length === 0) {
           this.$message.error('请至少添加一位观演人')
           return
         }
-        for (const item of this.passengerSelectList) {
-          if (!item.value) {
-            this.$message.error('请为每个观演人选择信息')
-            return
-          }
-        }
+
 
         this.submitting = true
 
         const orderData = {
-          items: this.orderItems,
-          passengers: this.passengerSelectList.map(i => i.value),
-          contact: this.contactForm, // 可选，兼容老数据
-          paymentMethod: this.paymentMethod,
-          remark: this.orderRemark,
-          totalAmount: this.totalAmount,
-          serviceFee: this.serviceFee,
-          finalAmount: this.finalAmount
+            audienceId: this.selectedAudience,
+            eventName: this.showDetails[0].name,
+            sessionId: this.sessionId,
+            sessionName: this.session.sessionName,
+            tierName: this.selectedTicket.tierName,
+            quantity: this.selectedAudience.length
         }
+        const response = await confirm(orderData)
+        console.log(response)
 
-        const response = await this.createOrder(orderData)
+        // const response = await this.createOrder(orderData)
 
-        this.$message.success('订单提交成功')
+        // this.$message.success('订单提交成功')
 
-        // 跳转到支付页面或订单详情页
-        this.$router.push({
-          path: '/user',
-          query: {tab: 'orders'}
-        })
+        // // 跳转到支付页面或订单详情页
+        // this.$router.push({
+        //   path: '/user',
+        //   query: {tab: 'orders'}
+        // })
       } catch (error) {
         this.$message.error(error.message || '订单提交失败')
       } finally {
@@ -484,4 +567,112 @@ export default {
     }
   }
 }
+
+.ticket-section {
+  background: #fff;
+  border-radius: $border-radius-large;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: $box-shadow-light;
+
+  h2 {
+    font-size: 24px;
+    color: $text-primary;
+    margin-bottom: 20px;
+  }
+
+  .ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .ticket-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 2px solid $border-color-light;
+    border-radius: $border-radius-base;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover, &.active {
+      border-color: $primary-color;
+      background: rgba($primary-color, 0.05);
+    }
+
+    .ticket-info {
+      .session-time {
+        font-size: $font-size-medium;
+        color: $text-primary;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .ticket-name {
+        font-size: $font-size-small;
+        color: $text-secondary;
+      }
+    }
+
+    .ticket-price {
+      .price {
+        color: $primary-color;
+        font-size: $font-size-large;
+        font-weight: bold;
+      }
+
+      .price-desc {
+        color: $text-secondary;
+        font-size: $font-size-small;
+        margin-left: 5px;
+      }
+    }
+  }
+}
+
+.audience-section {
+  background: #fff;
+  border-radius: $border-radius-large;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: $box-shadow-light;
+
+  h2 {
+    font-size: 24px;
+    color: $text-primary;
+    margin-bottom: 20px;
+  }
+
+  .audience-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .audience-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 2px solid $border-color-light;
+    border-radius: $border-radius-base;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover, &.active {
+      border-color: $primary-color;
+      background: rgba($primary-color, 0.05);
+    }
+
+    .audience-info {
+      .ticket-name {
+        font-size: $font-size-small;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
 </style>
