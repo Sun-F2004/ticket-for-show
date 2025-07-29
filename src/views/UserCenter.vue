@@ -225,9 +225,9 @@
               <el-button type="primary" @click="showAddPassenger = true" style="margin-bottom: 20px;">添加观演人</el-button>
               <el-table :data="passengers" style="width: 100%">
                 <el-table-column prop="name" label="姓名" width="120"/>
-                <el-table-column prop="idType" label="证件类型" width="120"/>
-                <el-table-column prop="idNumber" label="证件号码" width="180"/>
-                <el-table-column prop="phone" label="手机号" width="140"/>
+                <!-- <el-table-column prop="idType" label="证件类型" width="120"/> -->
+                <el-table-column prop="idCardNumber" label="证件号码" width="180"/>
+                <!-- <el-table-column prop="phone" label="手机号" width="140"/> --> -->
                 <el-table-column label="操作" width="180">
                   <template slot-scope="scope">
                     <el-button size="mini" @click="editPassenger(scope.row)">编辑</el-button>
@@ -241,19 +241,19 @@
                   <el-form-item label="姓名" prop="name">
                     <el-input v-model="passengerForm.name"/>
                   </el-form-item>
-                  <el-form-item label="证件类型" prop="idType">
+                  <!-- <el-form-item label="证件类型" prop="idType">
                     <el-select v-model="passengerForm.idType" placeholder="请选择证件类型">
                       <el-option label="身份证" value="身份证"/>
                       <el-option label="护照" value="护照"/>
                       <el-option label="港澳通行证" value="港澳通行证"/>
                     </el-select>
+                  </el-form-item> -->
+                  <el-form-item label="证件号码" prop="idCardNumber">
+                    <el-input v-model="passengerForm.idCardNumber"/>
                   </el-form-item>
-                  <el-form-item label="证件号码" prop="idNumber">
-                    <el-input v-model="passengerForm.idNumber"/>
-                  </el-form-item>
-                  <el-form-item label="手机号" prop="phone">
+                  <!-- <el-form-item label="手机号" prop="phone">
                     <el-input v-model="passengerForm.phone"/>
-                  </el-form-item>
+                  </el-form-item> -->
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                   <el-button @click="showAddPassenger = false">取 消</el-button>
@@ -271,6 +271,7 @@
 <script>
 import {mapGetters, mapActions} from 'vuex'
 import Header from '@/components/Header.vue'
+import { getPassengers } from '@/api/user'
 
 export default {
   name: 'UserCenter',
@@ -304,21 +305,15 @@ export default {
       orderList: [],
       favorites: [],
       addresses: [],
+      passengers: [],
       showAddPassenger: false,
       passengerForm: {
         name: '',
-        idType: '',
-        idNumber: '',
-        phone: ''
+        idCardNumber: '',
       },
       passengerRules: {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        idType: [{ required: true, message: '请选择证件类型', trigger: 'change' }],
-        idNumber: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
-        phone: [
-          { required: true, message: '请输入手机号', trigger: 'blur' },
-          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-        ]
+        idCardNumber: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
       },
       editPassengerData: null
     }
@@ -343,8 +338,8 @@ export default {
     this.loadPassengers()
   },
   methods: {
-    ...mapActions('user', ['updateUserInfo', 'getPassengers', 'addPassenger', 'updatePassenger', 'deletePassenger']),
-    ...mapActions('order', ['getOrderList']),
+    // ...mapActions('user', ['updateUserInfo', 'getPassengers', 'addPassenger', 'updatePassenger', 'deletePassenger']),
+    // ...mapActions('order', ['getOrderList']),
 
     handleMenuSelect(key) {
       this.activeMenu = key
@@ -509,8 +504,9 @@ export default {
     bindEmail() {
       this.$message.info('绑定邮箱功能开发中')
     },
-    loadPassengers() {
-      this.getPassengers()
+    async loadPassengers() {
+      const res = await getPassengers()
+      this.passengers = res.content
     },
     editPassenger(row) {
       this.editPassengerData = row
@@ -540,7 +536,7 @@ export default {
         }
         this.showAddPassenger = false
         this.editPassengerData = null
-        this.passengerForm = { name: '', idType: '', idNumber: '', phone: '' }
+        this.passengerForm = { name: '', idCardNumber: ''}
       })
     }
   }

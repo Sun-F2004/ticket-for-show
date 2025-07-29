@@ -37,7 +37,7 @@
                 </div>
                 <div class="meta-item">
                   <i class="el-icon-tickets"></i>
-                  <span>票价：¥{{ showDetail.minPrice }} - ¥{{ showDetail.maxPrice }}</span>
+                  <span>票价：¥{{ minPrice }} - ¥{{ maxPrice }}</span>
                 </div>
               </div>
 
@@ -159,6 +159,8 @@ export default {
   data() {
     return {
       showDetail: {},
+      minPrice: '',
+      maxPrice: '',
       sessions: [],
       selectedSession: null,
       isFavorite: false,
@@ -172,6 +174,8 @@ export default {
     const showId = this.$route.params.id
     await this.loadShowDetail(showId)
     await this.loadSessions(showId)
+    this.minPrice = Math.min(this.showDetail.tickets[0].price, this.showDetail.tickets[1].price)
+    this.maxPrice = Math.max(this.showDetail.tickets[0].price, this.showDetail.tickets[1].price)
   },
   methods: {
     ...mapActions('show', ['getShowDetail', 'getShowSessions']),

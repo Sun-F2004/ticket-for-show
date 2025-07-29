@@ -94,7 +94,7 @@
               <p class="show-venue">{{ show.position || show.venue }}</p>
               <p class="show-time">{{ show.startTime || show.time }}</p>
               <div class="show-price">
-                <span class="price">¥{{ show.minPrice }}</span>
+                <span class="price">¥{{ show.prices[0] }}</span>
                 <span class="price-desc">起</span>
               </div>
             </div>
@@ -126,7 +126,7 @@ export default {
   data() {
     return {
       // 城市、分类、子类、时间、排序等筛选项
-      cities: ['全部', '北京', '上海', '广州', '深圳', '杭州', '成都', '重庆', '西安', '南京'],
+      cities: ['全部', '北京市', '上海市', '广州市', '深圳市', '天津市', '成都市', '重庆市', '武汉市', '南京市'],
       selectedCity: '全部',
       categories: [],
       selectedCategory: '',

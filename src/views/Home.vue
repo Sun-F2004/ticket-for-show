@@ -62,7 +62,7 @@
               <p class="show-venue">{{ show.position }}</p>
               <p class="show-time">{{ show.startTime }}</p>
               <div class="show-price">
-                <span class="price">¥{{ show.minPrice }}</span>
+                <span class="price">¥{{ show.prices[0] }}</span>
                 <span class="price-desc">起</span>
               </div>
             </div>
@@ -99,7 +99,7 @@
               <p class="show-venue">{{ show.position }}</p>
               <p class="show-time">{{ show.startTime }}</p>
               <div class="show-price">
-                <span class="price">¥{{ show.minPrice }}</span>
+                <span class="price">¥{{ show.prices[0] }}</span>
                 <span class="price-desc">起</span>
               </div>
             </div>
@@ -136,7 +136,7 @@
               <p class="show-venue">{{ show.position }}</p>
               <p class="show-time">{{ show.startTime }}</p>
               <div class="show-price">
-                <span class="price">¥{{ show.minPrice }}</span>
+                <span class="price">¥{{ show.prices[0] }}</span>
                 <span class="price-desc">起</span>
               </div>
             </div>
