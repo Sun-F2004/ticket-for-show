@@ -93,10 +93,11 @@
               <div class="order-tabs">
                 <el-tabs v-model="orderTab" @tab-click="handleOrderTabClick">
                   <el-tab-pane label="全部" name="all"/>
-                  <el-tab-pane label="待付款" name="unpaid"/>
-                  <el-tab-pane label="待发货" name="unshipped"/>
-                  <el-tab-pane label="已完成" name="completed"/>
+                  <el-tab-pane label="待支付" name="unpaid"/>
+                  <el-tab-pane label="待处理中" name="unshipped"/>
+                  <el-tab-pane label="已支付" name="completed"/>
                   <el-tab-pane label="已取消" name="cancelled"/>
+                  <el-tab-pane label="已完成" name="finished"/>
                 </el-tabs>
               </div>
 

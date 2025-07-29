@@ -30,7 +30,7 @@
                   <span>{{ selectAudience.length }}</span>
                 </div>
                 <div class="item-total">
-                  <span class="total-price">¥{{ selectAudience.length * selectTicket.price }}</span>
+                  <span class="total-price">¥{{ totalPrice || 0 }}</span>
                 </div>
               </div>
             </div>
@@ -63,7 +63,7 @@
 
           <!-- 观演人选择 -->
           <div class="audience-section">
-            <h2>选择票</h2>
+            <h2>选择观演人</h2>
             <div class="audience-list">
               <div
                   v-for="audience in passengers"
@@ -155,6 +155,15 @@
               提交订单
             </el-button>
           </div>
+          <el-dialog
+            title="扫码支付"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
+            <span slot="footer" class="dialog-footer">
+              <img src="/ma.jpg" style="max-width: 100%; height: auto;" />
+            </span>
+          </el-dialog>
         </div>
       </div>
     </div>
@@ -174,6 +183,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       showDetails: [],
       passengers: [],
       tickets: [],
@@ -224,6 +234,10 @@ export default {
 
     finalAmount() {
       return this.totalAmount + this.serviceFee
+    },
+
+    totalPrice() {
+      return this.selectedAudience.length * this.selectedTicket.price
     }
   },
   async mounted() {
@@ -363,8 +377,13 @@ export default {
             tierName: this.selectedTicket.tierName,
             quantity: this.selectedAudience.length
         }
-        const response = await confirm(orderData)
-        console.log(response)
+        // const response = await confirm(orderData)
+        // console.log(response)
+
+        this.dialogVisible = true
+        setTimeout(() => {
+          this.dialogVisible = false
+        }, 5000)
 
         // const response = await this.createOrder(orderData)
 
@@ -661,7 +680,7 @@ export default {
     cursor: pointer;
     transition: $transition-base;
 
-    &:hover, &.active {
+    &.active {
       border-color: $primary-color;
       background: rgba($primary-color, 0.05);
     }
@@ -674,5 +693,7 @@ export default {
     }
   }
 }
+
+
 
 </style>
