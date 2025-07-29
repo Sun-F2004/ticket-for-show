@@ -92,12 +92,13 @@
               <h2>我的订单</h2>
               <div class="order-tabs">
                 <el-tabs v-model="orderTab" @tab-click="handleOrderTabClick">
-                  <el-tab-pane label="全部" name="all"/>
-                  <el-tab-pane label="待支付" name="unpaid"/>
-                  <el-tab-pane label="待处理中" name="unshipped"/>
-                  <el-tab-pane label="已支付" name="completed"/>
-                  <el-tab-pane label="已取消" name="cancelled"/>
-                  <el-tab-pane label="已完成" name="finished"/>
+                  <el-tab-pane label="全部" name=" " />
+                  <el-tab-pane label="待支付" name="P" />
+                  <el-tab-pane label="已支付" name="D" />
+                  <el-tab-pane label="已取消" name="C" />
+                  <el-tab-pane label="支付超时" name="E" />
+                  <el-tab-pane label="已完成" name="O" />
+                  <el-tab-pane label="已退款" name="R" />
                 </el-tabs>
               </div>
 
@@ -108,21 +109,21 @@
                     <span class="order-status">{{ getOrderStatusText(order.status) }}</span>
                   </div>
                   <div class="order-content">
-                    <div v-for="item in order.items" :key="item.id" class="order-product">
-                      <img :src="item.image" :alt="item.title"/>
+                    <div :key="order.id" class="order-product">
+                      <!-- <img :src="item.image" :alt="item.title"/> -->
                       <div class="product-info">
-                        <h4>{{ item.title }}</h4>
-                        <p>{{ item.venue }} | {{ item.time }}</p>
-                        <p>数量：{{ item.quantity }}</p>
+                        <h4>{{ order.eventName }}</h4>
+                        <p>{{ order.tierName }} | {{ order.startTime }}</p>
+                        <p>数量：{{ order.quantity }}</p>
                       </div>
                       <div class="product-price">
-                        <span>¥{{ item.price }}</span>
+                        <span>¥{{ order.unitPrice }}</span>
                       </div>
                     </div>
                   </div>
                   <div class="order-footer">
                     <div class="order-total">
-                      总计：<span class="total-price">¥{{ order.totalAmount }}</span>
+                      总计：<span class="total-price">¥{{ order.unitPrice * order.quantity }}</span>
                     </div>
                     <div class="order-actions">
                       <el-button v-if="order.status === 'unpaid'" type="primary" size="small">
@@ -137,6 +138,17 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="pagination-bar" v-if="total > pageSize">
+                <el-pagination
+                  background
+                  layout="prev, pager, next"
+                  :total="total"
+                  :page-size="pageSize"
+                  :current-page.sync="currentPage"
+                  @current-change="onPageChange"
+                />
               </div>
             </div>
 
@@ -270,6 +282,7 @@
 import {mapGetters, mapActions} from 'vuex'
 import Header from '@/components/Header.vue'
 import { getPassengers, addPassenger, getUserInfo } from '@/api/user'
+import { orderPage } from '@/api/order'
 
 export default {
   name: 'UserCenter',
@@ -279,8 +292,9 @@ export default {
   data() {
     return {
       activeMenu: 'profile',
-      orderTab: 'all',
+      orderTab: ' ',
       orderLoading: false,
+      currentStatus: "",
       profileForm: {
         account: '',
         nickName: '',
@@ -288,8 +302,20 @@ export default {
         phoneNumber: '',
         gender: '',
         birthday: '',
-        idCardNumber: ''
+        idCardNumber: '',
       },
+      userInfo: {
+        account: '',
+        nickName: '',
+        realName: '',
+        phoneNumber: '',
+        gender: '',
+        birthday: '',
+        idCardNumber: '',
+      },
+      total: 0,
+      pageSize: 10,
+      currentPage: 1,
       profileRules: {
         username: [
           {required: true, message: '请输入用户名', trigger: 'blur'}
@@ -318,7 +344,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('user', ['userInfo', 'passengers'])
+
   },
   watch: {
     $route(to) {
@@ -333,16 +359,42 @@ export default {
     if (tab) {
       this.activeMenu = tab
     }
+    this.fetchOrder()
     this.loadUserData()
     this.loadPassengers()
   },
   methods: {
     // ...mapActions('user', ['updateUserInfo', 'getPassengers', 'addPassenger', 'updatePassenger', 'deletePassenger']),
     // ...mapActions('order', ['getOrderList']),
+    onPageChange(page) {
+      this.currentPage = page
+      this.fetchOrder(this.currentStatus)
+    },
+
 
     handleMenuSelect(key) {
       this.activeMenu = key
       this.$router.push({query: {tab: key}})
+    },
+
+    async fetchOrder(status) {
+        this.orderLoading = true
+        try {
+          this.currentStatus = status
+          const data = {
+            current: this.currentPage,
+            size: this.pageSize,
+            status: this.currentStatus
+          }
+          const res = await orderPage(data)
+          this.orderList = res.list
+          this.total = res.total
+        } catch (error) {
+          console.log(error)
+        } finally {
+          this.orderLoading = false
+        }
+
     },
 
     async loadUserData() {
@@ -350,30 +402,30 @@ export default {
       console.log("用户信息")
       // 加载用户数据
       this.profileForm = res.content
-      console.log(this.profileForm)
+      this.userInfo = res.content
 
-      // 加载订单数据
-      await this.loadOrders()
+      // // 加载订单数据
+      // await this.fetchOrder
 
-      // 加载收藏数据
-      this.loadFavorites()
+      // // 加载收藏数据
+      // this.loadFavorites()
 
-      // 加载地址数据
-      this.loadAddresses()
+      // // 加载地址数据
+      // this.loadAddresses()
     },
 
-    async loadOrders() {
-      this.orderLoading = true
-      try {
-        const response = await this.getOrderList({status: this.orderTab})
-        this.orderList = response.data || this.getMockOrders()
-      } catch (error) {
-        console.error('加载订单失败:', error)
-        this.orderList = this.getMockOrders()
-      } finally {
-        this.orderLoading = false
-      }
-    },
+    // async loadOrders() {
+    //   this.orderLoading = true
+    //   try {
+    //     const response = await this.getOrderList({status: this.orderTab})
+    //     this.orderList = response.data || this.getMockOrders()
+    //   } catch (error) {
+    //     console.error('加载订单失败:', error)
+    //     this.orderList = this.getMockOrders()
+    //   } finally {
+    //     this.orderLoading = false
+    //   }
+    // },
 
     getMockOrders() {
       return [
@@ -425,10 +477,11 @@ export default {
 
     getOrderStatusText(status) {
       const statusMap = {
-        unpaid: '待付款',
-        unshipped: '待发货',
-        completed: '已完成',
-        cancelled: '已取消'
+        P: '待支付',
+        G: '处理中',
+        D: '已支付',
+        C: '已取消',
+        O: '已完成'
       }
       return statusMap[status] || status
     },
@@ -443,7 +496,8 @@ export default {
     },
 
     handleOrderTabClick() {
-      this.loadOrders()
+      console.log("tab" + this.orderTab)
+      this.fetchOrder(this.orderTab)
     },
 
     cancelOrder(orderId) {

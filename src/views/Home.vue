@@ -113,7 +113,8 @@
       <div class="container">
         <div class="section-header">
           <h2>最新演出</h2>
-          <router-link to="/category/latest" class="more-link">查看更多 <i class="el-icon-arrow-right"></i>
+          <router-link to="/category/2" class="more-link">
+            查看更多 <i class="el-icon-arrow-right"></i>
           </router-link>
         </div>
 

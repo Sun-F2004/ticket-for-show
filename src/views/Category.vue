@@ -131,7 +131,6 @@ export default {
       categories: [],
       selectedCategory: '',
       // subCategories: ['全部', '其他', '球类运动', '电竞'], // 可根据实际接口调整
-      selectedSubCategory: '全部',
       timeOptions: [
         { label: '全部', value: '' },
         { label: '今天', value: 'today' },
@@ -160,7 +159,6 @@ export default {
     '$route.params.id': {
       immediate: true,
       handler(newVal) {
-        console.log("rwarwarID:" + this.$route.params.id)
         this.selectedCategory = newVal
         this.currentPage = 1
         this.fetchCategories()

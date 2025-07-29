@@ -17,6 +17,14 @@ export function pay(data) {
     })
 }
 
+export function orderPage(data) {
+    return request({
+        url: '/order/order/page',
+        method: 'post',
+        data
+    })
+}
+
 
 // // 创建订单
 // export function createOrder(data) {

@@ -255,7 +255,6 @@ export default {
 
     async loadOrderData() {
       const { showDetail, sessionId } = this.$route.query
-      console.log("传过来的sessionID:" + sessionId)
       this.showDetails.push(showDetail)
       this.sessionId = sessionId
       for (const session of showDetail.sessions) {
@@ -265,11 +264,7 @@ export default {
       }
       console.log(showDetail)
       for (const ticket of showDetail.tickets) {
-        console.log("循环")
-        console.log(ticket)
-        console.log(ticket.sessionId)
         if (ticket.sessionId == this.sessionId) {
-          console.log("找到了:" + ticket)
           this.tickets.push(ticket)
         }
       }
@@ -377,13 +372,32 @@ export default {
             tierName: this.selectedTicket.tierName,
             quantity: this.selectedAudience.length
         }
-        // const response = await confirm(orderData)
-        // console.log(response)
-
+        const response = await confirm(orderData)
+        console.log("response")
+        console.log(response)
+        const payData = {
+          ids: response.content,
+          sessionId: this.sessionId,
+          tierName: this.selectedTicket.tierName
+        }
+        console.log("payData")
+        console.log(payData)
         this.dialogVisible = true
-        setTimeout(() => {
+        setTimeout(async () => {
           this.dialogVisible = false
+          try {
+            const payResponse = await pay(payData)
+            console.log(payResponse.content)
+            this.$message.success("已支付,订单处理中")
+            this.$router.push({
+              path: '/user',
+              query: {tab: 'orders'}
+            })
+          } catch (e) {
+            this.$message.error("支付失败")
+          }
         }, 5000)
+
 
         // const response = await this.createOrder(orderData)
 
