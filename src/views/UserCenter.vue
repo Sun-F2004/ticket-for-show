@@ -28,18 +28,6 @@
                 <i class="el-icon-tickets"></i>
                 <span>我的订单</span>
               </el-menu-item>
-              <el-menu-item index="favorites">
-                <i class="el-icon-star-on"></i>
-                <span>我的收藏</span>
-              </el-menu-item>
-              <el-menu-item index="address">
-                <i class="el-icon-location"></i>
-                <span>收货地址</span>
-              </el-menu-item>
-              <el-menu-item index="security">
-                <i class="el-icon-lock"></i>
-                <span>账户安全</span>
-              </el-menu-item>
               <el-menu-item index="passenger">
                 <i class="el-icon-s-custom"></i>
                 <span>观演人管理</span>
@@ -53,33 +41,34 @@
             <div v-if="activeMenu === 'profile'" class="profile-section">
               <h2>个人资料</h2>
               <el-form
-                  ref="profileForm"
-                  :model="profileForm"
-                  :rules="profileRules"
+                  :model="userInfo"
+                  :rules="userInfoRules"
                   label-width="100px"
               >
                 <el-form-item label="用户名" prop="account">
-                  <el-input v-model="profileForm.account"/>
+                  <el-input v-model="userInfo.account"/>
                 </el-form-item>
                 <el-form-item label="真实姓名" prop="realName">
-                  <el-input v-model="profileForm.realName"/>
+                  <el-input v-model="userInfo.realName"/>
                 </el-form-item>
                 <el-form-item label="手机号" prop="phoneNumber">
-                  <el-input v-model="profileForm.phoneNumber"/>
+                  <el-input v-model="userInfo.phoneNumber"/>
                 </el-form-item>
                 <el-form-item label="性别" prop="gender">
-                  <el-radio-group v-model="profileForm.gender">
-                    <el-radio label="male">男</el-radio>
-                    <el-radio label="female">女</el-radio>
-                    <el-radio label="other">其他</el-radio>
+                  <el-radio-group v-model="userInfo.gender">
+                    <el-radio :label="1">男</el-radio>
+                    <el-radio :label="0">女</el-radio>
                   </el-radio-group>
                 </el-form-item>
                 <el-form-item label="生日" prop="birthday">
                   <el-date-picker
-                      v-model="profileForm.birthday"
+                      v-model="userInfo.birthday"
                       type="date"
                       placeholder="选择生日"
                   />
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                  <el-input v-model="userInfo.password" type="password" show-password/>
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" @click="updateProfile">保存修改</el-button>
@@ -92,13 +81,12 @@
               <h2>我的订单</h2>
               <div class="order-tabs">
                 <el-tabs v-model="orderTab" @tab-click="handleOrderTabClick">
-                  <el-tab-pane label="全部" name=" " />
-                  <el-tab-pane label="待支付" name="P" />
-                  <el-tab-pane label="已支付" name="D" />
-                  <el-tab-pane label="已取消" name="C" />
-                  <el-tab-pane label="支付超时" name="E" />
-                  <el-tab-pane label="已完成" name="O" />
-                  <el-tab-pane label="已退款" name="R" />
+                  <el-tab-pane label="全部" name=""/>
+                  <el-tab-pane label="待支付" name="P"/>
+                  <el-tab-pane label="处理中" name="G"/>
+                  <el-tab-pane label="已支付" name="D"/>
+                  <el-tab-pane label="已取消" name="C"/>
+                  <el-tab-pane label="已完成" name="O"/>
                 </el-tabs>
               </div>
 
@@ -132,9 +120,6 @@
                       <el-button v-if="order.status === 'unpaid'" size="small" @click="cancelOrder(order.id)">
                         取消订单
                       </el-button>
-                      <el-button size="small" @click="viewOrderDetail(order.id)">
-                        查看详情
-                      </el-button>
                     </div>
                   </div>
                 </div>
@@ -142,105 +127,25 @@
 
               <div class="pagination-bar" v-if="total > pageSize">
                 <el-pagination
-                  background
-                  layout="prev, pager, next"
-                  :total="total"
-                  :page-size="pageSize"
-                  :current-page.sync="currentPage"
-                  @current-change="onPageChange"
+                    background
+                    layout="prev, pager, next"
+                    :total="total"
+                    :page-size="pageSize"
+                    :current-page.sync="currentPage"
+                    @current-change="onPageChange"
                 />
-              </div>
-            </div>
-
-            <!-- 我的收藏 -->
-            <div v-if="activeMenu === 'favorites'" class="favorites-section">
-              <h2>我的收藏</h2>
-              <div class="favorites-grid">
-                <div v-for="show in favorites" :key="show.id" class="favorite-item">
-                  <img :src="show.image" :alt="show.title"/>
-                  <div class="favorite-info">
-                    <h4>{{ show.title }}</h4>
-                    <p>{{ show.venue }}</p>
-                    <p>{{ show.time }}</p>
-                    <div class="favorite-actions">
-                      <el-button type="primary" size="small" @click="goToShow(show.id)">
-                        立即购票
-                      </el-button>
-                      <el-button size="small" @click="removeFavorite(show.id)">
-                        取消收藏
-                      </el-button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 收货地址 -->
-            <div v-if="activeMenu === 'address'" class="address-section">
-              <h2>收货地址</h2>
-              <div class="address-list">
-                <div v-for="address in addresses" :key="address.id" class="address-item">
-                  <div class="address-info">
-                    <h4>{{ address.name }} {{ address.phone }}</h4>
-                    <p>{{ address.province }} {{ address.city }} {{ address.district }}</p>
-                    <p>{{ address.detail }}</p>
-                  </div>
-                  <div class="address-actions">
-                    <el-button type="text" size="small" @click="editAddress(address)">
-                      编辑
-                    </el-button>
-                    <el-button type="text" size="small" @click="deleteAddress(address.id)">
-                      删除
-                    </el-button>
-                  </div>
-                </div>
-                <el-button type="dashed" @click="addAddress">
-                  <i class="el-icon-plus"></i>
-                  添加新地址
-                </el-button>
-              </div>
-            </div>
-
-            <!-- 账户安全 -->
-            <div v-if="activeMenu === 'security'" class="security-section">
-              <h2>账户安全</h2>
-              <div class="security-items">
-                <div class="security-item">
-                  <div class="security-info">
-                    <h4>登录密码</h4>
-                    <p>建议定期更换密码，确保账户安全</p>
-                  </div>
-                  <el-button @click="changePassword">修改密码</el-button>
-                </div>
-                <div class="security-item">
-                  <div class="security-info">
-                    <h4>手机绑定</h4>
-                    <p>已绑定：{{ userInfo.phone || '未绑定' }}</p>
-                  </div>
-                  <el-button @click="bindPhone">绑定手机</el-button>
-                </div>
-                <div class="security-item">
-                  <div class="security-info">
-                    <h4>邮箱绑定</h4>
-                    <p>已绑定：{{ userInfo.email || '未绑定' }}</p>
-                  </div>
-                  <el-button @click="bindEmail">绑定邮箱</el-button>
-                </div>
               </div>
             </div>
 
             <!-- 观演人管理 -->
             <div v-if="activeMenu === 'passenger'" class="passenger-section">
               <h2>观演人管理</h2>
-              <el-button type="primary" @click="showAddPassenger = true" style="margin-bottom: 20px;">添加观演人</el-button>
+              <el-button type="primary" @click="showAddPassenger = true" style="margin-bottom: 20px;">添加观演人
+              </el-button>
               <el-table :data="passengers" style="width: 100%">
                 <el-table-column prop="name" label="姓名" width="120"/>
-                <!-- <el-table-column prop="idType" label="证件类型" width="120"/> -->
-                <el-table-column prop="idCardNumber" label="证件号码" width="180"/>
-                <!-- <el-table-column prop="phone" label="手机号" width="140"/> --> -->
                 <el-table-column label="操作" width="180">
                   <template slot-scope="scope">
-                    <el-button size="mini" @click="editPassenger(scope.row)">编辑</el-button>
                     <el-button size="mini" type="danger" @click="deletePassengerConfirm(scope.row.id)">删除</el-button>
                   </template>
                 </el-table-column>
@@ -251,19 +156,9 @@
                   <el-form-item label="姓名" prop="name">
                     <el-input v-model="passengerForm.name"/>
                   </el-form-item>
-                  <!-- <el-form-item label="证件类型" prop="idType">
-                    <el-select v-model="passengerForm.idType" placeholder="请选择证件类型">
-                      <el-option label="身份证" value="身份证"/>
-                      <el-option label="护照" value="护照"/>
-                      <el-option label="港澳通行证" value="港澳通行证"/>
-                    </el-select>
-                  </el-form-item> -->
                   <el-form-item label="证件号码" prop="idCardNumber">
                     <el-input v-model="passengerForm.idCardNumber"/>
                   </el-form-item>
-                  <!-- <el-form-item label="手机号" prop="phone">
-                    <el-input v-model="passengerForm.phone"/>
-                  </el-form-item> -->
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                   <el-button @click="showAddPassenger = false">取 消</el-button>
@@ -279,10 +174,10 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from 'vuex'
 import Header from '@/components/Header.vue'
-import { getPassengers, addPassenger, getUserInfo } from '@/api/user'
-import { orderPage } from '@/api/order'
+import {addPassenger, deletePassenger, getPassengers, updateUserInfo} from '@/api/user'
+import {orderPage} from '@/api/order'
+import {mapActions} from "vuex";
 
 export default {
   name: 'UserCenter',
@@ -292,40 +187,29 @@ export default {
   data() {
     return {
       activeMenu: 'profile',
-      orderTab: ' ',
+      orderTab: '',
       orderLoading: false,
       currentStatus: "",
-      profileForm: {
-        account: '',
-        nickName: '',
-        realName: '',
-        phoneNumber: '',
-        gender: '',
-        birthday: '',
-        idCardNumber: '',
-      },
-      userInfo: {
-        account: '',
-        nickName: '',
-        realName: '',
-        phoneNumber: '',
-        gender: '',
-        birthday: '',
-        idCardNumber: '',
-      },
+      userInfo: '',
       total: 0,
       pageSize: 10,
       currentPage: 1,
-      profileRules: {
-        username: [
-          {required: true, message: '请输入用户名', trigger: 'blur'}
+      userInfoRules: {
+        realName: [
+          {required: true, message: '请输入真名', trigger: 'blur'}
         ],
-        phone: [
-          {pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur'}
+        nickname: [
+          {required: true, message: '请输入昵称', trigger: 'blur'}
         ],
-        email: [
-          {type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur'}
-        ]
+        gender: [
+          {required: true, message: '请选择性别', trigger: 'change'}
+        ],
+        phoneNumber: [
+          {required: true, message: '请输入电话号码', trigger: 'blur'}
+        ],
+        password: [
+          {required: true, message: '请输入密码', trigger: 'blur'}
+        ],
       },
       orderList: [],
       favorites: [],
@@ -337,14 +221,11 @@ export default {
         idCardNumber: '',
       },
       passengerRules: {
-        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        idCardNumber: [{ required: true, message: '请输入证件号码', trigger: 'blur' }],
+        name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
+        idCardNumber: [{required: true, message: '请输入证件号码', trigger: 'blur'}],
       },
       editPassengerData: null
     }
-  },
-  computed: {
-
   },
   watch: {
     $route(to) {
@@ -354,18 +235,18 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     const tab = this.$route.query.tab
     if (tab) {
       this.activeMenu = tab
     }
-    this.fetchOrder()
-    this.loadUserData()
-    this.loadPassengers()
+    await this.fetchOrder()
+    this.passengers = await this.getPassengers()
+    this.userInfo = await this.getUserInfo()
   },
   methods: {
-    // ...mapActions('user', ['updateUserInfo', 'getPassengers', 'addPassenger', 'updatePassenger', 'deletePassenger']),
-    // ...mapActions('order', ['getOrderList']),
+    ...mapActions('user', ['getUserInfo', 'getPassengers']),
+
     onPageChange(page) {
       this.currentPage = page
       this.fetchOrder(this.currentStatus)
@@ -373,45 +254,29 @@ export default {
 
 
     handleMenuSelect(key) {
+      if (this.activeMenu === key) return
       this.activeMenu = key
       this.$router.push({query: {tab: key}})
     },
 
     async fetchOrder(status) {
-        this.orderLoading = true
-        try {
-          this.currentStatus = status
-          const data = {
-            current: this.currentPage,
-            size: this.pageSize,
-            status: this.currentStatus
-          }
-          const res = await orderPage(data)
-          this.orderList = res.list
-          this.total = res.total
-        } catch (error) {
-          console.log(error)
-        } finally {
-          this.orderLoading = false
+      this.orderLoading = true
+      try {
+        this.currentStatus = status
+        const data = {
+          current: this.currentPage,
+          size: this.pageSize,
+          status: this.currentStatus
         }
+        const res = await orderPage(data)
+        this.orderList = res.list
+        this.total = res.total
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.orderLoading = false
+      }
 
-    },
-
-    async loadUserData() {
-      const res = await getUserInfo()
-      console.log("用户信息")
-      // 加载用户数据
-      this.profileForm = res.content
-      this.userInfo = res.content
-
-      // // 加载订单数据
-      // await this.fetchOrder
-
-      // // 加载收藏数据
-      // this.loadFavorites()
-
-      // // 加载地址数据
-      // this.loadAddresses()
     },
 
     // async loadOrders() {
@@ -427,54 +292,6 @@ export default {
     //   }
     // },
 
-    getMockOrders() {
-      return [
-        {
-          id: 1,
-          orderNumber: 'ORD20240101001',
-          status: 'unpaid',
-          totalAmount: 1160,
-          items: [
-            {
-              id: 1,
-              title: '周杰伦2024巡回演唱会-北京站',
-              venue: '北京工人体育馆',
-              time: '2024-06-15 19:30',
-              price: 580,
-              quantity: 2,
-              image: 'https://via.placeholder.com/80x80/ff6b35/ffffff?text=演唱会'
-            }
-          ]
-        }
-      ]
-    },
-
-    loadFavorites() {
-      this.favorites = [
-        {
-          id: 1,
-          title: '周杰伦2024巡回演唱会-北京站',
-          venue: '北京工人体育馆',
-          time: '2024-06-15 19:30',
-          image: 'https://via.placeholder.com/200x150/ff6b35/ffffff?text=演唱会'
-        }
-      ]
-    },
-
-    loadAddresses() {
-      this.addresses = [
-        {
-          id: 1,
-          name: '张三',
-          phone: '13800138000',
-          province: '北京市',
-          city: '北京市',
-          district: '朝阳区',
-          detail: '三里屯街道1号'
-        }
-      ]
-    },
-
     getOrderStatusText(status) {
       const statusMap = {
         P: '待支付',
@@ -488,8 +305,9 @@ export default {
 
     async updateProfile() {
       try {
-        await this.updateUserInfo(this.profileForm)
+        await updateUserInfo(this.userInfo)
         this.$message.success('个人资料更新成功')
+        this.userInfo = await this.getUserInfo()
       } catch (error) {
         this.$message.error('更新失败')
       }
@@ -511,62 +329,13 @@ export default {
       })
     },
 
-    viewOrderDetail(orderId) {
-      this.$message.info('订单详情功能开发中')
-    },
-
-    goToShow(showId) {
-      this.$router.push(`/show/${showId}`)
-    },
-
-    removeFavorite(showId) {
-      this.$confirm('确定要取消收藏吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.favorites = this.favorites.filter(item => item.id !== showId)
-        this.$message.success('已取消收藏')
-      })
-    },
-
-    addAddress() {
-      this.$message.info('添加地址功能开发中')
-    },
-
-    editAddress(address) {
-      this.$message.info('编辑地址功能开发中')
-    },
-
-    deleteAddress(addressId) {
-      this.$confirm('确定要删除这个地址吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.addresses = this.addresses.filter(item => item.id !== addressId)
-        this.$message.success('地址已删除')
-      })
-    },
-
-    changePassword() {
-      this.$message.info('修改密码功能开发中')
-    },
-
-    bindPhone() {
-      this.$message.info('绑定手机功能开发中')
-    },
-
-    bindEmail() {
-      this.$message.info('绑定邮箱功能开发中')
-    },
     async loadPassengers() {
       const res = await getPassengers()
       this.passengers = res.content
     },
     editPassenger(row) {
       this.editPassengerData = row
-      this.passengerForm = { ...row }
+      this.passengerForm = {...row}
       this.showAddPassenger = true
     },
     deletePassengerConfirm(id) {
@@ -575,8 +344,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deletePassenger(id).then(() => {
+        deletePassenger({id: id}).then(async () => {
           this.$message.success('删除成功')
+          const res = await getPassengers()
+          this.passengers = res.content
         })
       })
     },
@@ -593,7 +364,7 @@ export default {
         }
         this.showAddPassenger = false
         this.editPassengerData = null
-        this.passengerForm = { name: '', idCardNumber: ''}
+        this.passengerForm = {name: '', idCardNumber: ''}
       })
     },
   }
@@ -893,25 +664,6 @@ export default {
 
   .el-button {
     margin-right: 10px;
-  }
-}
-
-// 响应式设计
-@media (max-width: 768px) {
-  .user-content {
-    grid-template-columns: 1fr;
-  }
-
-  .favorites-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .order-item {
-    .order-footer {
-      flex-direction: column;
-      gap: 15px;
-      text-align: center;
-    }
   }
 }
 </style>

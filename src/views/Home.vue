@@ -6,10 +6,10 @@
     <div class="banner-section">
       <el-carousel height="400px" indicator-position="outside">
         <el-carousel-item v-for="show in hotShows" :key="show.id">
-          <div class="banner-item" :style="{ backgroundImage: `url(${show.mainImageUrl})` }">
+          <div class="banner-item" :style="{ backgroundImage: `url(${show.mainImageUrl})`}">
             <div class="banner-content">
               <h2>{{ show.name }}</h2>
-              <el-button type="primary" size="large" @click="goToShow(show.showId)">
+              <el-button type="primary" size="large" @click="goToShow(show.id)">
                 立即购票
               </el-button>
             </div>
@@ -40,7 +40,6 @@
       <div class="container">
         <div class="section-header">
           <h2>热门演出</h2>
-          <router-link to="/category/hot" class="more-link">查看更多 <i class="el-icon-arrow-right"></i></router-link>
         </div>
 
         <div v-loading="loading" class="show-grid">
@@ -76,8 +75,6 @@
       <div class="container">
         <div class="section-header">
           <h2>为您推荐</h2>
-          <router-link to="/category/recommended" class="more-link">查看更多 <i class="el-icon-arrow-right"></i>
-          </router-link>
         </div>
 
         <div v-loading="loading" class="show-grid">
@@ -113,9 +110,6 @@
       <div class="container">
         <div class="section-header">
           <h2>最新演出</h2>
-          <router-link to="/category/2" class="more-link">
-            查看更多 <i class="el-icon-arrow-right"></i>
-          </router-link>
         </div>
 
         <div v-loading="loading" class="show-grid">
@@ -149,7 +143,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 import {getCategory, getEvent} from '@/api/event'
 import Header from '@/components/Header.vue'
 
@@ -160,143 +154,64 @@ export default {
   },
   data() {
     return {
-      banners: [
-        {
-          id: 1,
-          title: '周杰伦2024巡回演唱会',
-          description: '地表最强，王者归来',
-          image: 'https://via.placeholder.com/1200x400/ff6b35/ffffff?text=周杰伦演唱会',
-          showId: 1
-        },
-        {
-          id: 2,
-          title: '经典话剧《雷雨》',
-          description: '曹禺经典作品，震撼上演',
-          image: 'https://via.placeholder.com/1200x400/4CAF50/ffffff?text=雷雨话剧',
-          showId: 2
-        },
-        {
-          id: 3,
-          title: '儿童剧《小王子》',
-          description: '童话世界，童心未泯',
-          image: 'https://via.placeholder.com/1200x400/2196F3/ffffff?text=小王子儿童剧',
-          showId: 3
-        }
-      ],
-      // categories: [
-      //   {id: 1, name: '演唱会', icon: 'el-icon-microphone', path: '/category/concert'},
-      //   {id: 2, name: '话剧', icon: 'el-icon-video-camera', path: '/category/drama'},
-      //   {id: 3, name: '音乐剧', icon: 'el-icon-headset', path: '/category/musical'},
-      //   {id: 4, name: '戏曲', icon: 'el-icon-trophy', path: '/category/opera'},
-      //   {id: 5, name: '儿童剧', icon: 'el-icon-star-on', path: '/category/children'},
-      //   {id: 6, name: '展览', icon: 'el-icon-picture', path: '/category/exhibition'},
-      //   {id: 7, name: '音乐会', icon: 'el-icon-service', path: '/category/classical'},
-      //   {id: 8, name: '舞蹈', icon: 'el-icon-user', path: '/category/dance'}
-      // ],
-      categories: [],
+      loading: false,
       hotShows: [],
       recommendedShows: [],
       latestShows: []
     }
   },
   computed: {
-    ...mapGetters('show', ['loading'])
+    ...mapState('user', ['categories']),
   },
   async mounted() {
     await this.loadShows()
     await this.loadCategories()
   },
   methods: {
-    ...mapActions('show', ['getShowList']),
+    ...mapMutations('user', ['SET_CATEGORIES']),
 
     async loadCategories() {
-      const { content } = await getCategory()
-      this.categories = content
-      console.log(this.categories)
+      if (this.categories.length) return
+      const {content} = await getCategory()
+      this.SET_CATEGORIES(content)
     },
 
     async loadShows() {
       try {
+        if (this.loading) return
+        this.loading = true
         // 获取热门演出
         const hotRes = await getEvent(1, 4, "广州市")
         this.hotShows = hotRes.list
 
         // 获取推荐演出
-        const recommandRes  = await getEvent(1, 4, null, 3)
-        this.recommendedShows = recommandRes.list
+        const recommendRes = await getEvent(1, 4, null, 3)
+        this.recommendedShows = recommendRes.list
 
         // 获取最新演出
-        const latestRes = await getEvent(1, 4, null, null, "2025-07-01", "2025-07-10")
-        this.latestShows = latestRes.list
-
-        console.log(this.hotShows)
-        console.log(this.recommendedShows)
-        console.log(this.latestShows)
-
+        let date = new Date()
+        const y = date.getFullYear()
+        const m = (date.getMonth() + 1).toString().padStart(2, '0')
+        const d = date.getDate().toString().padStart(2, '0')
+        const latestRes = await getEvent(1, 4, null, null, `${y}-${m}-${d}`)
+        this.latestShows = latestRes.list.sort((a, b) => {
+          return Date.parse(b.startTime.split('T')[0]) - Date.parse(a.startTime.split('T')[0])
+        })
       } catch (error) {
         console.error('加载演出数据失败:', error)
-        // 使用模拟数据
-        this.hotShows = this.getMockShows('hot')
-        this.recommendedShows = this.getMockShows('recommended')
-        this.latestShows = this.getMockShows('latest')
+      } finally {
+        this.loading = false
       }
     },
 
-    getMockShows(type) {
-      const mockShows = [
-        {
-          id: 1,
-          title: '周杰伦2024巡回演唱会-北京站',
-          venue: '北京工人体育馆',
-          time: '2024-06-15 19:30',
-          minPrice: 380,
-          image: 'https://via.placeholder.com/300x200/ff6b35/ffffff?text=周杰伦演唱会',
-          isHot: true,
-          isNew: false
-        },
-        {
-          id: 2,
-          title: '经典话剧《雷雨》',
-          venue: '国家大剧院',
-          time: '2024-05-20 19:30',
-          minPrice: 180,
-          image: 'https://via.placeholder.com/300x200/4CAF50/ffffff?text=雷雨话剧',
-          isHot: false,
-          isNew: true
-        },
-        {
-          id: 3,
-          title: '儿童剧《小王子》',
-          venue: '中国儿童艺术剧院',
-          time: '2024-05-25 14:30',
-          minPrice: 120,
-          image: 'https://via.placeholder.com/300x200/2196F3/ffffff?text=小王子儿童剧',
-          isHot: false,
-          isNew: true
-        },
-        {
-          id: 4,
-          title: '音乐剧《猫》',
-          venue: '保利剧院',
-          time: '2024-06-10 19:30',
-          minPrice: 280,
-          image: 'https://via.placeholder.com/300x200/9C27B0/ffffff?text=音乐剧猫',
-          isHot: true,
-          isNew: false
-        }
-      ]
-
-      return mockShows.slice(0, 4)
-    },
-
     goToShow(showId) {
-      this.$router.push(`/show/${showId}`).catch(err => {})
+      this.$router.push(`/show/${showId}`).catch(err => {
+      })
     },
 
     goToCategory(category) {
-      console.log("分类ID: " + category)
       // 跳转到分类页面，传递分类ID
-      this.$router.push(`/category/${category}`)
+      this.$router.push({path: '/category', query: {id: category}})
     }
   }
 }

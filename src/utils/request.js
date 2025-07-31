@@ -1,5 +1,4 @@
 import axios from 'axios'
-import system from "@/utils/system";
 
 // 创建axios实例
 const service = axios.create({
@@ -10,7 +9,7 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
     config => {
-        const token = system.token
+        const token = sessionStorage.getItem('token')
         if (token) {
             config.headers['satoken'] = token
         }
@@ -26,10 +25,8 @@ service.interceptors.response.use(
     response => {
         const res = response.data
         if (response.config.responseType !== 'blob' && res.code !== 1) {
-            console.log("请求233")
             return Promise.reject(new Error(res.message || '请求失败'))
         } else {
-            console.log(response.config.responseType)
             return res
         }
     },

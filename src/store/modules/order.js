@@ -1,5 +1,3 @@
-import {createOrder, getOrderList, getOrderDetail, cancelOrder, payOrder} from '@/api/order'
-
 const state = {
     orderList: [],
     currentOrder: {},

@@ -29,31 +29,12 @@ export function getUserInfo() {
 // 更新用户信息
 export function updateUserInfo(data) {
     return request({
-        url: '/user/update',
-        method: 'put',
-        data
+        url: '/user/user/update',
+        method: 'POST',
+        data: data
     })
 }
 
-// 修改密码
-export function changePassword(data) {
-    return request({
-        url: '/user/change-password',
-        method: 'put',
-        data
-    })
-}
-
-// 忘记密码
-export function forgotPassword(data) {
-    return request({
-        url: '/user/forgot-password',
-        method: 'post',
-        data
-    })
-}
-
-// 观演人管理
 // 获取观演人列表
 export function getPassengers() {
     return request({

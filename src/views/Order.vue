@@ -23,15 +23,6 @@
                   <p class="item-time">{{ item.startTime }}</p>
                   <p class="item-session">场次：{{ session.sessionName }}</p>
                 </div>
-                <!-- <div class="item-price">
-                  <span class="price">¥{{ item.price }}</span>
-                </div> -->
-                <div class="item-quantity">
-                  <span>{{ selectAudience.length }}</span>
-                </div>
-                <div class="item-total">
-                  <span class="total-price">¥{{ totalPrice || 0 }}</span>
-                </div>
               </div>
             </div>
           </div>
@@ -76,56 +67,10 @@
                   <div class="audience-name">{{ audience.name }}</div>
                 </div>
               </div>
+              <div v-if="!passengers.length" class="audience-name">
+                请前去用户中心添加观演人！
+              </div>
             </div>
-          </div>
-
-          <!-- 观演人选择 -->
-          <!-- <div class="passenger-select-section">
-            <h2>选择观演人</h2>
-            <div v-for="(pid, idx) in passengerSelectList" :key="pid.id" class="passenger-select-row">
-              <el-select v-model="pid.value" placeholder="请选择观演人" style="width: 220px;">
-                <el-option
-                  v-for="p in passengers"
-                  :key="p.id"
-                  :label="p.name"
-                  :value="p"
-                />
-              </el-select>
-              <el-button type="danger" icon="el-icon-delete" size="mini" @click="removePassengerSelect(idx)" v-if="passengerSelectList.length > 1 && idx > 0" style="margin-left: 10px;">删除</el-button>
-            </div>
-            <el-button type="primary" icon="el-icon-plus" size="mini" @click="addPassengerSelect" style="margin-top: 10px;">添加观演人</el-button>
-          </div> -->
-
-          <!-- 支付方式 -->
-          <div class="payment-method">
-            <h2>支付方式</h2>
-            <div class="payment-options">
-              <el-radio-group v-model="paymentMethod">
-                <el-radio label="alipay">
-                  <i class="el-icon-money"></i>
-                  支付宝
-                </el-radio>
-                <el-radio label="wechat">
-                  <i class="el-icon-chat-dot-round"></i>
-                  微信支付
-                </el-radio>
-                <el-radio label="unionpay">
-                  <i class="el-icon-credit-card"></i>
-                  银联支付
-                </el-radio>
-              </el-radio-group>
-            </div>
-          </div>
-
-          <!-- 订单备注 -->
-          <div class="order-remark">
-            <h2>订单备注</h2>
-            <el-input
-                v-model="orderRemark"
-                type="textarea"
-                :rows="3"
-                placeholder="请输入订单备注（选填）"
-            />
           </div>
 
           <!-- 订单金额 -->
@@ -156,10 +101,10 @@
             </el-button>
           </div>
           <el-dialog
-            title="扫码支付"
-            :visible.sync="dialogVisible"
-            width="30%"
-            :before-close="handleClose">
+              title="扫码支付"
+              :visible.sync="dialogVisible"
+              width="30%"
+              :before-close="handleClose">
             <span slot="footer" class="dialog-footer">
               <img src="/ma.jpg" style="max-width: 100%; height: auto;" />
             </span>
@@ -173,8 +118,8 @@
 <script>
 import {mapActions, mapGetters} from 'vuex'
 import Header from '@/components/Header.vue'
-import { getPassengers } from '@/api/user'
-import { confirm, pay } from '@/api/order'
+import {getPassengers} from '@/api/user'
+import {confirm, pay} from '@/api/order'
 
 export default {
   name: 'Order',
@@ -214,7 +159,7 @@ export default {
       orderRemark: '',
       submitting: false,
       passengerSelectList: [
-        { id: Date.now(), value: null }
+        {id: Date.now(), value: null}
       ],
     }
   },
@@ -223,9 +168,7 @@ export default {
     ...mapGetters('user', ['userInfo', 'passengers']),
 
     totalAmount() {
-      return this.orderItems.reduce((total, item) => {
-        return total + (item.price * item.quantity)
-      }, 0)
+      return this.selectedAudience.length * this.selectedTicket.price
     },
 
     serviceFee() {
@@ -235,10 +178,6 @@ export default {
     finalAmount() {
       return this.totalAmount + this.serviceFee
     },
-
-    totalPrice() {
-      return this.selectedAudience.length * this.selectedTicket.price
-    }
   },
   async mounted() {
     await this.loadOrderData()
@@ -249,12 +188,12 @@ export default {
     ...mapActions('order', ['createOrder']),
 
     async getPassengers() {
-      const { content } = await getPassengers()
+      const {content} = await getPassengers()
       this.passengers = content
     },
 
     async loadOrderData() {
-      const { showDetail, sessionId } = this.$route.query
+      const {showDetail, sessionId} = this.$route.query
       this.showDetails.push(showDetail)
       this.sessionId = sessionId
       for (const session of showDetail.sessions) {
@@ -268,79 +207,12 @@ export default {
           this.tickets.push(ticket)
         }
       }
-
-
-      // if (from === 'cart' && items) {
-      //   // 从购物车来的订单
-      //   this.orderItems = this.getCartItems(items.split(','))
-      // } else if (showId && sessionId) {
-      //   // 直接购买的订单
-      //   this.orderItems = [this.getDirectOrderItem(showId, sessionId)]
-      // } else {
-      //   this.$message.error('订单信息不完整')
-      //   this.$router.push('/')
-      //   return
-      // }
-
-      // 预填联系人信息
-      // if (this.userInfo) {
-      //   this.contactForm.name = this.userInfo.name || ''
-      //   this.contactForm.phone = this.userInfo.phone || ''
-      //   this.contactForm.email = this.userInfo.email || ''
-      // }
     },
 
-    getCartItems(itemIds) {
-      // 这里应该从购物车获取商品信息
-      // 暂时使用模拟数据
-      return [
-        {
-          id: 1,
-          title: '周杰伦2024巡回演唱会-北京站',
-          venue: '北京工人体育馆',
-          time: '2024-06-15 19:30',
-          session: '2024-06-15 19:30',
-          price: 580,
-          quantity: 2,
-          image: 'https://via.placeholder.com/100x100/ff6b35/ffffff?text=演唱会'
-        },
-        {
-          id: 2,
-          title: '经典话剧《雷雨》',
-          venue: '国家大剧院',
-          time: '2024-05-20 19:30',
-          session: '2024-05-20 19:30',
-          price: 180,
-          quantity: 1,
-          image: 'https://via.placeholder.com/100x100/4CAF50/ffffff?text=话剧'
-        }
-      ]
-    },
-
-    getDirectOrderItem(showId, sessionId) {
-      // 这里应该根据showId和sessionId获取商品信息
-      // 暂时使用模拟数据
-      return {
-        id: showId,
-        title: '周杰伦2024巡回演唱会-北京站',
-        venue: '北京工人体育馆',
-        time: '2024-06-15 19:30',
-        session: '2024-06-15 19:30',
-        price: 580,
-        quantity: 1,
-        image: 'https://via.placeholder.com/100x100/ff6b35/ffffff?text=演唱会'
-      }
-    },
-
-    addPassengerSelect() {
-      this.passengerSelectList.push({ id: Date.now() + Math.random(), value: null })
-    },
-    removePassengerSelect(idx) {
-      this.passengerSelectList.splice(idx, 1)
-    },
     selectTicket(ticket) {
       this.selectedTicket = ticket
     },
+
     selectAudience(id) {
       let index = this.selectedAudience.indexOf(id)
       if (index !== -1) {
@@ -361,33 +233,27 @@ export default {
           return
         }
 
-
         this.submitting = true
 
         const orderData = {
-            audienceId: this.selectedAudience,
-            eventName: this.showDetails[0].name,
-            sessionId: this.sessionId,
-            sessionName: this.session.sessionName,
-            tierName: this.selectedTicket.tierName,
-            quantity: this.selectedAudience.length
+          audienceId: this.selectedAudience,
+          eventName: this.showDetails[0].name,
+          sessionId: this.sessionId,
+          sessionName: this.session.sessionName,
+          tierName: this.selectedTicket.tierName,
+          quantity: this.selectedAudience.length
         }
         const response = await confirm(orderData)
-        console.log("response")
-        console.log(response)
         const payData = {
           ids: response.content,
           sessionId: this.sessionId,
           tierName: this.selectedTicket.tierName
         }
-        console.log("payData")
-        console.log(payData)
         this.dialogVisible = true
         setTimeout(async () => {
           this.dialogVisible = false
           try {
             const payResponse = await pay(payData)
-            console.log(payResponse.content)
             this.$message.success("已支付,订单处理中")
             this.$router.push({
               path: '/user',
@@ -397,17 +263,6 @@ export default {
             this.$message.error("支付失败")
           }
         }, 5000)
-
-
-        // const response = await this.createOrder(orderData)
-
-        // this.$message.success('订单提交成功')
-
-        // // 跳转到支付页面或订单详情页
-        // this.$router.push({
-        //   path: '/user',
-        //   query: {tab: 'orders'}
-        // })
       } catch (error) {
         this.$message.error(error.message || '订单提交失败')
       } finally {
@@ -707,7 +562,6 @@ export default {
     }
   }
 }
-
 
 
 </style>

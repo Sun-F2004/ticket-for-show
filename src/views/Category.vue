@@ -8,12 +8,12 @@
         <div class="filter-row">
           <span class="filter-label">城市：</span>
           <el-tag
-            v-for="city in cities"
-            :key="city"
-            :type="city === selectedCity ? 'primary' : 'info'"
-            @click="onCityChange(city)"
-            class="filter-tag"
-            effect="plain"
+              v-for="city in cities"
+              :key="city"
+              :type="city === selectedCity ? 'primary' : 'info'"
+              @click="onCityChange(city)"
+              class="filter-tag"
+              effect="plain"
           >
             {{ city }}
           </el-tag>
@@ -22,50 +22,37 @@
         <div class="filter-row">
           <span class="filter-label">分类：</span>
           <el-tag
-            v-for="cat in categories"
-            :key="cat.id"
-            :type="cat.id == selectedCategory ? 'primary' : 'info'"
-            @click="onCategoryChange(cat.id)"
-            class="filter-tag"
-            effect="plain"
+              :type="selectedCategory === '全部' ? 'primary' : 'info'"
+              @click="onCategoryChange('全部')"
+              class="filter-tag"
+              effect="plain">
+            全部
+          </el-tag>
+          <el-tag
+              v-for="cat in categories"
+              :key="cat.id"
+              :type="cat.id == selectedCategory ? 'primary' : 'info'"
+              @click="onCategoryChange(cat.id)"
+              class="filter-tag"
+              effect="plain"
           >
             {{ cat.categoryName }}
           </el-tag>
         </div>
-        <!-- 子类（模拟） -->
-        <!-- <div class="filter-row">
-          <span class="filter-label">子类：</span>
-          <el-tag
-            v-for="sub in subCategories"
-            :key="sub"
-            :type="sub === selectedSubCategory ? 'primary' : 'info'"
-            @click="onSubCategoryChange(sub)"
-            class="filter-tag"
-            effect="plain"
-          >
-            {{ sub }}
-          </el-tag>
-        </div> -->
         <!-- 时间 -->
         <div class="filter-row">
           <span class="filter-label">时间：</span>
           <el-tag
-            v-for="t in timeOptions"
-            :key="t.value"
-            :type="t.value === selectedTime ? 'primary' : 'info'"
-            @click="onTimeChange(t.value)"
-            class="filter-tag"
-            effect="plain"
+              v-for="t in timeOptions"
+              :key="t.value"
+              :type="t.value === selectedTime ? 'primary' : 'info'"
+              @click="onTimeChange(t.value)"
+              class="filter-tag"
+              effect="plain"
           >
             {{ t.label }}
           </el-tag>
         </div>
-      </div>
-      <!-- 二级导航 -->
-      <div class="sub-nav">
-        <el-tabs v-model="selectedSort" @tab-click="onSortChange" type="card">
-          <el-tab-pane v-for="sort in sortOptions" :key="sort.value" :label="sort.label" :name="sort.value"/>
-        </el-tabs>
       </div>
       <!-- 列表区域 -->
       <div class="show-list">
@@ -77,10 +64,10 @@
         </div>
         <div v-else class="show-grid">
           <div
-            v-for="show in events"
-            :key="show.id"
-            class="show-card"
-            @click="goToShow(show.id)"
+              v-for="show in events"
+              :key="show.id"
+              class="show-card"
+              @click="goToShow(show.id)"
           >
             <div class="show-image">
               <img :src="show.mainImageUrl || show.image" :alt="show.name || show.title"/>
@@ -104,12 +91,12 @@
       <!-- 分页 -->
       <div class="pagination-bar" v-if="total > pageSize">
         <el-pagination
-          background
-          layout="prev, pager, next"
-          :total="total"
-          :page-size="pageSize"
-          :current-page.sync="currentPage"
-          @current-change="onPageChange"
+            background
+            layout="prev, pager, next"
+            :total="total"
+            :page-size="pageSize"
+            :current-page.sync="currentPage"
+            @current-change="onPageChange"
         />
       </div>
     </div>
@@ -117,36 +104,27 @@
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'
 import Header from '../components/Header.vue'
-import { getCategory, getEvent } from '@/api/event'
+import {getCategory, getEvent} from '@/api/event'
 
 export default {
   name: 'Category',
-  components: { Header },
+  components: {Header},
   data() {
     return {
       // 城市、分类、子类、时间、排序等筛选项
       cities: ['全部', '北京市', '上海市', '广州市', '深圳市', '天津市', '成都市', '重庆市', '武汉市', '南京市'],
       selectedCity: '全部',
-      categories: [],
       selectedCategory: '',
-      // subCategories: ['全部', '其他', '球类运动', '电竞'], // 可根据实际接口调整
       timeOptions: [
-        { label: '全部', value: '' },
-        { label: '今天', value: 'today' },
-        { label: '明天', value: 'tomorrow' },
-        { label: '本周末', value: 'weekend' },
-        { label: '一个月内', value: 'month' },
-        { label: '按日历', value: 'calendar' }
+        {label: '全部', value: ''},
+        {label: '今天', value: 'today'},
+        {label: '明天', value: 'tomorrow'},
+        {label: '本周末', value: 'weekend'},
+        {label: '一个月内', value: 'month'},
       ],
       selectedTime: '',
-      sortOptions: [
-        { label: '相关排序', value: 'relevant' },
-        { label: '推荐排序', value: 'recommend' },
-        { label: '最近开场', value: 'recent' },
-        { label: '最新上架', value: 'newest' }
-      ],
-      selectedSort: 'recommend',
       // 列表数据
       events: [],
       loading: false,
@@ -155,21 +133,27 @@ export default {
       currentPage: 1
     }
   },
-  watch: {
-    '$route.params.id': {
-      immediate: true,
-      handler(newVal) {
-        this.selectedCategory = newVal
-        this.currentPage = 1
-        this.fetchCategories()
-        this.fetchEvents()
-      }
+
+  mounted() {
+    if (this.$route.query.id) {
+      this.selectedCategory = this.$route.query.id
+      this.currentPage = 1
+      this.fetchCategories()
+      this.fetchEvents()
     }
   },
+
+  computed: {
+    ...mapState('user', ['categories']),
+  },
+
   methods: {
+    ...mapMutations('user', ['SET_CATEGORIES']),
+
     async fetchCategories() {
-      const { content } = await getCategory()
-      this.categories = content
+      if (this.categories.length) return
+      const {content} = await getCategory()
+      this.SET_CATEGORIES(content)
     },
     async fetchEvents() {
       this.loading = true
@@ -179,7 +163,8 @@ export default {
         if (this.selectedTime === 'today') {
           fromDate = toDate = this.formatDate(new Date())
         } else if (this.selectedTime === 'tomorrow') {
-          const d = new Date(); d.setDate(d.getDate() + 1)
+          const d = new Date();
+          d.setDate(d.getDate() + 1)
           fromDate = toDate = this.formatDate(d)
         } else if (this.selectedTime === 'weekend') {
           // 本周末
@@ -191,17 +176,18 @@ export default {
           toDate = this.formatDate(saturday)
         } else if (this.selectedTime === 'month') {
           fromDate = this.formatDate(new Date())
-          const d = new Date(); d.setMonth(d.getMonth() + 1)
+          const d = new Date();
+          d.setMonth(d.getMonth() + 1)
           toDate = this.formatDate(d)
         }
         const res = await getEvent(
-          this.currentPage,
-          this.pageSize,
+            this.currentPage,
+            this.pageSize,
 
-          this.selectedCity === '全部' ? null : this.selectedCity,
-          this.selectedCategory === '全部' ? null : this.selectedCategory,
-          fromDate,
-          toDate
+            this.selectedCity === '全部' ? null : this.selectedCity,
+            this.selectedCategory === '全部' ? null : this.selectedCategory,
+            fromDate,
+            toDate
         )
         this.events = res.list || []
         this.total = res.total || 0
@@ -222,18 +208,8 @@ export default {
       this.currentPage = 1
       this.fetchEvents()
     },
-    onSubCategoryChange(sub) {
-      this.selectedSubCategory = sub
-      this.currentPage = 1
-      this.fetchEvents()
-    },
     onTimeChange(val) {
       this.selectedTime = val
-      this.currentPage = 1
-      this.fetchEvents()
-    },
-    onSortChange(tab) {
-      this.selectedSort = tab.name
       this.currentPage = 1
       this.fetchEvents()
     },
@@ -258,43 +234,53 @@ export default {
 .category-page {
   min-height: 100vh;
   background: $background-color-base;
+
   .category-container {
     padding: 40px 0 60px 0;
   }
 }
+
 .filter-bar {
   margin-bottom: 20px;
+
   .filter-row {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
+
     .filter-label {
       font-weight: bold;
       margin-right: 10px;
       color: $text-regular;
       min-width: 48px;
     }
+
     .filter-tag {
       margin-right: 8px;
       cursor: pointer;
     }
   }
 }
+
 .sub-nav {
   margin-bottom: 20px;
+
   .el-tabs__item.is-active {
     color: $primary-color !important;
     font-weight: bold;
   }
 }
+
 .show-list {
   min-height: 300px;
 }
+
 .show-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
+
 .show-card {
   background: #fff;
   border-radius: $border-radius-large;
@@ -303,20 +289,24 @@ export default {
   transition: $transition-base;
   cursor: pointer;
   display: flex;
+
   .show-image {
     position: relative;
     width: 160px;
     height: 200px;
     flex-shrink: 0;
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+
     .show-tags {
       position: absolute;
       top: 10px;
       left: 10px;
+
       .tag {
         display: inline-block;
         padding: 2px 8px;
@@ -324,39 +314,47 @@ export default {
         font-size: 12px;
         color: #fff;
         margin-right: 6px;
+
         &.tag-hot {
           background: $primary-color;
         }
+
         &.tag-new {
           background: $secondary-color;
         }
       }
     }
   }
+
   .show-info {
     padding: 16px;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
+
     .show-title {
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 8px;
       color: $text-primary;
     }
+
     .show-venue, .show-time {
       font-size: 14px;
       color: $text-secondary;
       margin-bottom: 4px;
     }
+
     .show-price {
       margin-top: 8px;
+
       .price {
         color: $primary-color;
         font-size: 18px;
         font-weight: bold;
       }
+
       .price-desc {
         color: $text-secondary;
         font-size: 12px;
@@ -365,14 +363,16 @@ export default {
     }
   }
 }
+
 .loading-box, .empty-box {
   text-align: center;
   color: $text-secondary;
   padding: 60px 0;
   font-size: 18px;
 }
+
 .pagination-bar {
   margin-top: 40px;
   text-align: center;
 }
-</style> 
+</style>

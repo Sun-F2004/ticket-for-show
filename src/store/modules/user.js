@@ -1,32 +1,46 @@
-import {getUserInfo, login, register, updateUserInfo, getPassengers, addPassenger, updatePassenger, deletePassenger} from '@/api/user'
-import system from "@/utils/system";
+import {
+    addPassenger,
+    deletePassenger,
+    getPassengers,
+    getUserInfo,
+    login,
+    register,
+    updatePassenger,
+    updateUserInfo
+} from '@/api/user'
 
 const state = {
-    token: system.token,
-    userInfo: {},
+    userInfo: null,
     isLogin: false,
-    passengers: [] // 观演人列表
+    passengers: [], // 观演人列表
+    categories: [], // 分类列表
 }
 
 const mutations = {
-    SET_USER_INFO(state, userInfo) {
-        state.userInfo = userInfo
+    SET_TOKEN(state, token) {
+        sessionStorage.setItem('token', token)
         state.isLogin = true
     },
+    SET_USER_INFO(state, userInfo) {
+        state.userInfo = userInfo
+    },
     CLEAR_USER(state) {
-        system.token = ''
+        sessionStorage.removeItem('token')
         state.userInfo = {}
         state.isLogin = false
         state.passengers = []
     },
     SET_PASSENGERS(state, passengers) {
         state.passengers = passengers
-    }
+    },
+    SET_CATEGORIES(state, categories) {
+        state.categories = categories
+    },
 }
 
 const actions = {
     // 用户登录
-    async login({commit}, loginForm) {
+    async login({commit, dispatch}, loginForm) {
         try {
             await login(loginForm)
             const cookies = document.cookie.split(';')
@@ -40,7 +54,7 @@ const actions = {
                     break
                 }
             }
-            system.token = token
+            commit('SET_TOKEN', token)
             commit('SET_USER_INFO', loginForm)
         } catch (error) {
             throw error
@@ -57,22 +71,10 @@ const actions = {
     },
 
     // 获取用户信息
-    async getUserInfo({commit}) {
+    async getUserInfo() {
         try {
             const response = await getUserInfo()
-            commit('SET_USER_INFO', response.data)
-            return response
-        } catch (error) {
-            throw error
-        }
-    },
-
-    // 更新用户信息
-    async updateUserInfo({commit}, userInfo) {
-        try {
-            const response = await updateUserInfo(userInfo)
-            commit('SET_USER_INFO', response.data)
-            return response
+            return response.content
         } catch (error) {
             throw error
         }
@@ -87,12 +89,14 @@ const actions = {
     async getPassengers({commit}) {
         try {
             const res = await getPassengers()
+            console.log(res.content)
             commit('SET_PASSENGERS', res.data || [])
-            return res
+            return res.content
         } catch (error) {
             throw error
         }
     },
+
     // 添加观演人
     async addPassenger({dispatch}, passenger) {
         try {
@@ -102,6 +106,7 @@ const actions = {
             throw error
         }
     },
+
     // 编辑观演人
     async updatePassenger({dispatch}, passenger) {
         try {
@@ -111,6 +116,7 @@ const actions = {
             throw error
         }
     },
+
     // 删除观演人
     async deletePassenger({dispatch}, id) {
         try {
@@ -125,7 +131,6 @@ const actions = {
 const getters = {
     isLogin: state => state.isLogin,
     userInfo: state => state.userInfo,
-    token: state => state.token,
     passengers: state => state.passengers
 }
 

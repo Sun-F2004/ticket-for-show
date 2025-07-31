@@ -97,21 +97,21 @@
             />
           </el-form-item>
 
-         <el-form-item prop="captcha">
-           <div class="captcha">
-             <el-input
-                 v-model="registerForm.captcha"
-                 placeholder="请输入验证码"
-                 prefix-icon="el-icon-key"
-                 size="large"
-             />
+          <el-form-item prop="captcha">
+            <div class="captcha">
+              <el-input
+                  v-model="registerForm.captcha"
+                  placeholder="请输入验证码"
+                  prefix-icon="el-icon-key"
+                  size="large"
+              />
 
-             <el-image
-               :src="captchaUrl"
-               fit="cover"
-               @click="getCaptcha"/>
-           </div>
-           </el-form-item>
+              <el-image
+                  :src="captchaUrl"
+                  fit="cover"
+                  @click="getCaptcha"/>
+            </div>
+          </el-form-item>
 
           <el-form-item>
             <el-button
@@ -175,7 +175,7 @@ export default {
           {required: true, message: '请输入昵称', trigger: 'blur'}
         ],
         gender: [
-          { required: true, message: '请选择性别', trigger: 'change' }
+          {required: true, message: '请选择性别', trigger: 'change'}
         ],
         phoneNumber: [
           {required: true, message: '请输入电话号码', trigger: 'blur'}
@@ -199,7 +199,6 @@ export default {
       },
       loading: false,
       captchaUrl: '',
-      // captchaKey: '' // 验证码对应的key标识
     }
   },
 
@@ -211,9 +210,8 @@ export default {
     ...mapActions('user', ['register']),
 
     async getCaptcha() {
-        const blob = await getCaptcha()
-        this.captchaUrl = window.URL.createObjectURL(blob)
-        console.log(this.captchaUrl)
+      const blob = await getCaptcha()
+      this.captchaUrl = window.URL.createObjectURL(blob)
     },
 
     async handleRegister() {
@@ -222,7 +220,8 @@ export default {
         this.$refs.registerForm.validate(isValid => {
           valid = isValid
         })
-        if (!valid) return
+        if (!valid || this.loading) return
+
         this.loading = true
         await validate(this.registerForm.captcha)
         await this.register(this.registerForm)

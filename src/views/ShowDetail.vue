@@ -5,23 +5,10 @@
     <div class="detail-container">
       <div class="container">
         <div v-loading="loading" class="detail-content">
-          <!-- 面包屑导航
-          <el-breadcrumb separator="/" class="breadcrumb">
-            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-            <el-breadcrumb-item :to="{ path: `/category/${showDetail.category}` }">
-              {{ getCategoryName(showDetail.category) }}
-            </el-breadcrumb-item>
-            <el-breadcrumb-item>{{ showDetail.title }}</el-breadcrumb-item>
-          </el-breadcrumb> -->
-
           <!-- 演出基本信息 -->
           <div class="show-info-section">
             <div class="show-image">
               <img :src="showDetail.mainImageUrl" :alt="showDetail.name"/>
-              <!-- <div class="show-tags">
-                <span v-if="showDetail.isHot" class="tag tag-hot">热门</span>
-                <span v-if="showDetail.isNew" class="tag tag-new">新品</span>
-              </div> -->
             </div>
 
             <div class="show-info">
@@ -41,23 +28,10 @@
                 </div>
               </div>
 
-              <!-- <div class="show-description">
-                <h3>演出介绍</h3>
-                <img :src="showDetail.mainImageUrl" :alt="showDetail.mainImageUrl" />
-              </div> -->
-
               <div class="show-actions">
                 <el-button type="primary" size="large" @click="goToBooking">
                   <i class="el-icon-tickets"></i>
                   立即购票
-                </el-button>
-                <el-button size="large" @click="addToCart">
-                  <i class="el-icon-shopping-cart-2"></i>
-                  加入购物车
-                </el-button>
-                <el-button size="large" @click="toggleFavorite">
-                  <i :class="isFavorite ? 'el-icon-star-on' : 'el-icon-star-off'"></i>
-                  {{ isFavorite ? '已收藏' : '收藏' }}
                 </el-button>
               </div>
             </div>
@@ -91,29 +65,12 @@
             </div>
           </div>
 
-          <!-- 座位选择 -->
-          <!-- <div v-if="selectedSession" class="seats-section">
-            <h2>选择座位</h2>
-            <div class="seats-container">
-              <div class="stage">舞台</div>
-              <div class="seats-map"> -->
-                <!-- 这里可以集成座位选择组件 -->
-                <!-- <div class="seats-placeholder">
-                  <i class="el-icon-tickets"></i>
-                  <p>座位选择功能开发中</p>
-                  <p>请点击"立即购票"进入购票流程</p>
-                </div>
-              </div>
-            </div>
-          </div> -->
-
           <!-- 演出详情 -->
           <div class="detail-tabs">
             <el-tabs v-model="activeTab">
               <el-tab-pane label="演出详情" name="detail">
-                <div class="detail-content">
-                  <img :src="showDetail.description" :alt="showDetail.name" />
-                </div>
+                <el-image class="detail-content" :src="showDetail.description" fit="cover">
+                </el-image>
               </el-tab-pane>
               <el-tab-pane label="购票须知" name="notice">
                 <div class="notice-content">
@@ -148,7 +105,7 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex'
-import { getEventInfo, getSession } from '@/api/event'
+import {getEventInfo, getSession} from '@/api/event'
 import Header from '@/components/Header.vue'
 
 export default {
@@ -167,9 +124,7 @@ export default {
       activeTab: 'detail'
     }
   },
-  computed: {
-    ...mapGetters('show', ['loading'])
-  },
+
   async mounted() {
     const showId = this.$route.params.id
     await this.loadShowDetail(showId)
@@ -178,8 +133,6 @@ export default {
     this.maxPrice = Math.max(this.showDetail.tickets[0].price, this.showDetail.tickets[1].price)
   },
   methods: {
-    ...mapActions('show', ['getShowDetail', 'getShowSessions']),
-    ...mapActions('cart', ['addToCart']),
 
     async loadShowDetail(showId) {
       try {
@@ -187,7 +140,6 @@ export default {
         this.showDetail = response.content
       } catch (error) {
         console.error('加载演出详情失败:', error)
-        this.showDetail = this.getMockShowDetail()
       }
     },
 
@@ -200,62 +152,10 @@ export default {
         }
       } catch (error) {
         console.error('加载场次信息失败:', error)
-        this.sessions = this.getMockSessions()
         if (this.sessions.length > 0) {
           this.selectedSession = this.sessions[0]
         }
       }
-    },
-
-    getMockShowDetail() {
-      return {
-        id: this.$route.params.id,
-        title: '周杰伦2024巡回演唱会-北京站',
-        venue: '北京工人体育馆',
-        time: '2024-06-15 19:30',
-        artist: '周杰伦',
-        minPrice: 380,
-        maxPrice: 1280,
-        image: 'https://via.placeholder.com/400x300/ff6b35/ffffff?text=周杰伦演唱会',
-        description: '地表最强，王者归来！周杰伦2024巡回演唱会震撼来袭，带你重温经典，感受音乐的魅力。',
-        category: 'concert',
-        isHot: true,
-        isNew: false,
-        detailContent: '<p>演出详情内容...</p>'
-      }
-    },
-
-    getMockSessions() {
-      return [
-        {
-          id: 1,
-          time: '2024-06-15 19:30',
-          venue: '北京工人体育馆',
-          minPrice: 380,
-          maxPrice: 1280,
-          status: 'selling'
-        },
-        {
-          id: 2,
-          time: '2024-06-16 19:30',
-          venue: '北京工人体育馆',
-          minPrice: 380,
-          maxPrice: 1280,
-          status: 'selling'
-        }
-      ]
-    },
-
-    getCategoryName(category) {
-      const categoryMap = {
-        concert: '演唱会',
-        drama: '话剧',
-        musical: '音乐剧',
-        opera: '戏曲',
-        children: '儿童剧',
-        exhibition: '展览'
-      }
-      return categoryMap[category] || '演出'
     },
 
     selectSession(session) {
@@ -272,8 +172,8 @@ export default {
         query: {
           // showId: this.showDetail.id,
           // sessionId: this.selectedSession.id
-            showDetail: this.showDetail,
-            sessionId: this.selectedSession.id
+          showDetail: this.showDetail,
+          sessionId: this.selectedSession.id
         }
       })
     },
@@ -538,24 +438,6 @@ export default {
         line-height: 1.6;
       }
     }
-  }
-}
-
-// 响应式设计
-@media (max-width: 768px) {
-  .show-info-section {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .show-actions {
-    flex-direction: column;
-  }
-
-  .session-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
   }
 }
 </style>

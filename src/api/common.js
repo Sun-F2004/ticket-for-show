@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import {Message} from "element-ui";
 
 // 获取验证码
 export function getCaptcha() {
@@ -10,17 +9,13 @@ export function getCaptcha() {
     })
 }
 
+// 校验验证码
 export function validate(captcha) {
     return request({
         url: '/common/kaptcha/validate',
         method: 'post',
         data: {
-            "captcha" : captcha
+            "captcha": captcha
         }
     })
 }
-
-
-
-
-// fire 123

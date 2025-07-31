@@ -10,12 +10,11 @@
             <el-dropdown @command="handleCommand">
               <span class="user-info">
                 <i class="el-icon-user"></i>
-                {{ userInfo.username }}
+                {{ userInfo.account }}
                 <i class="el-icon-arrow-down"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="userCenter">个人中心</el-dropdown-item>
-                <el-dropdown-item command="orders">我的订单</el-dropdown-item>
                 <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -35,24 +34,6 @@
             <h1>演出购票系统</h1>
           </router-link>
         </div>
-
-        <div class="search-box">
-          <el-input
-              v-model="searchKeyword"
-              placeholder="搜索演出、艺人、场馆"
-              @keyup.enter.native="handleSearch"
-              class="search-input"
-          >
-            <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
-          </el-input>
-        </div>
-
-        <div class="header-actions">
-          <router-link to="/cart" class="cart-link">
-            <i class="el-icon-shopping-cart-2"></i>
-            <span class="cart-count" v-if="cartCount > 0">{{ cartCount }}</span>
-          </router-link>
-        </div>
       </div>
     </div>
 
@@ -66,12 +47,8 @@
             text-color="#333"
             active-text-color="#ff6b35"
         >
-
-
-          <el-menu-item v-for="cat in categories" :key="cat.id" :index="cat.path" @click="goToCategory(cat.id)">
-              {{ cat.categoryName }}
-          </el-menu-item>
-          
+          <el-menu-item index="/">首页</el-menu-item>
+          <el-menu-item index="/category">查询</el-menu-item>
         </el-menu>
       </div>
     </div>
@@ -79,21 +56,17 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from 'vuex'
-import { getCategory } from '@/api/event'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
   name: 'Header',
   data() {
     return {
-      searchKeyword: '',
-      activeIndex: '/',
-      categories: []
+      activeIndex: '/'
     }
   },
   computed: {
-    ...mapGetters('user', ['isLogin', 'userInfo']),
-    ...mapGetters('cart', ['cartCount'])
+    ...mapGetters('user', ['isLogin', 'userInfo'])
   },
   watch: {
     $route(to) {
@@ -102,40 +75,19 @@ export default {
   },
   async mounted() {
     this.activeIndex = this.$route.path
-    if (this.isLogin) {
-
-    }
-    await this.getCat()
   },
   methods: {
     ...mapActions('user', ['logout']),
-    ...mapActions('cart', ['getCart']),
-
-    handleSearch() {
-      if (this.searchKeyword.trim()) {
-        this.$router.push({
-          path: '/',
-          query: {search: this.searchKeyword}
-        })
-      }
-    },
 
     handleSelect(key) {
+      if (this.activeIndex === key) return
       this.$router.push(key)
-    },
-
-    async getCat() {
-      const categoriesRes = await getCategory()
-      this.categories = categoriesRes.content
     },
 
     async handleCommand(command) {
       switch (command) {
         case 'userCenter':
-          this.$router.push('/user')
-          break
-        case 'orders':
-          this.$router.push('/user?tab=orders')
+          if (this.$route.path !== '/user') this.$router.push('/user')
           break
         case 'logout':
           try {
@@ -147,11 +99,6 @@ export default {
           }
           break
       }
-    },
-
-    goToCategory(category) {
-      console.log("分类ID: " + category)
-      this.$router.push({ name: 'Category', params: { id: category } })
     }
   }
 }

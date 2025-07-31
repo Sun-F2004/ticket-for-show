@@ -7,10 +7,10 @@ export function confirm(data) {
         method: 'post',
         data
     })
-} 
+}
 
 export function pay(data) {
-        return request({
+    return request({
         url: '/order/order/pay',
         method: 'post',
         data
